@@ -155,4 +155,48 @@ Invoking the APIGateway Rest API follows the same workflow used for the local La
    2025-02-03 12:33:56        494 data.csv
    ```
 
+#### Project Layout
+```
+.
+├── Dockerfile
+├── README.md
+├── _tests_
+│   ├── api.test.ts
+│   ├── csvData.test.ts
+│   ├── httpClient.test.ts
+│   └── processData.test.ts
+├── data
+│   └── data.csv
+├── jest.config.js
+├── package-lock.json
+├── package.json
+├── src
+│   ├── api.ts
+│   ├── authorizer.ts
+│   ├── csvData.ts
+│   ├── httpClient.ts
+│   ├── index.ts
+│   ├── processData.ts
+│   └── transformers.ts
+└── tf
+    ├── apigw.tf
+    ├── backend.tf
+    ├── main.tf
+    ├── modules
+    │   └── docker-build
+    │       ├── main.tf
+    │       ├── outputs.tf
+    │       ├── variables.tf
+    │       └── versions.tf
+    ├── variables.tf
+    └── versions.tf
 
+```
+----------------------------
+|File/Directory|Description|
+---------------|------------
+|Dockerfile|Used for local and AWS image build
+|test|Unit Tests|
+|data|Mount point used for local image|
+|src|Lambda Node.js source|
+|tf|Terraform IaC for AWS provisioning|
