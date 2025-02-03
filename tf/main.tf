@@ -58,6 +58,10 @@ module "lambda_function_with_docker_build_from_ecr" {
   function_name = "pge-lambda-with-docker-build-from-ecr"
   description   = "PGE Test"
 
+  environment_variables = {
+    FILE_OUTPUT = aws_s3_bucket.pge_data_bucket.bucket
+  }
+
   create_package = false
 
   ##################
@@ -74,8 +78,8 @@ module "docker_build_from_ecr" {
 
   ecr_repo = module.ecr.repository_name
 
-  use_image_tag = true
-  image_tag   = "pge-v1"
+  use_image_tag = false
+  image_tag   = "pge"
 
   source_path = local.source_path
   platform    = "linux/amd64"
@@ -95,6 +99,7 @@ module "ecr" {
 
   repository_name         = "pge-ecr"
   repository_force_delete = true
+  repository_image_tag_mutability = "MUTABLE"
 
   create_lifecycle_policy = false
 

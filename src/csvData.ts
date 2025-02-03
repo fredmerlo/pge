@@ -24,7 +24,7 @@ export class CsvData {
 
       console.log("PutObject to S3");
       await s3.send(new PutObjectCommand({
-        Bucket: "pge-data-bucket",
+        Bucket: FILE_OUTPUT,
         Key: "data.csv",
         Body: csv,
       }));
