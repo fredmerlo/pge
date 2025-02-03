@@ -33,7 +33,7 @@
 
 ### Implementation Approach
 
-  The solution is implemented as a Docker image for AWS Lambda, Node.Js and Typescript.
+  The solution is implemented as a Docker image for AWS Lambda, Node.Js, Typescript and Hapi (Server, Routes, Authorization, JWT, HttpClient).
 
   Using this strategy we gain: platform neutrality, consistent feature functionality and a single-codebase for local and cloud operations.
 
@@ -66,7 +66,7 @@ After cloning the repository:
    ```
    npm run test
    ```
-   The output is verbose, as intended, and there will be a few stack traces. This is expected, several tests check error boundaries and the integrated logger is doing it's job to display the error condition.
+   The output is verbose, as intended, so there will be a few stack traces in the output. This is expected, several tests check error boundaries and the integrated logger is doing it's job to display the error condition.
 
 4. Upon completion the test result summary will display:
    ```
@@ -93,21 +93,21 @@ From the local repository root directory:
    ```
    Let's break-down each argument:
 
-   + **--mount** since this is an AWS Lambda image there really is no *local* file storage per-se, to clarify once an image has been published it is immutable. This argument binds a local directory to the image mount point **dst=/processed** this mount value is necessary for local csv file delivery and should not be modified. The **src=/some-full/host-directory** can be any path on the local system, it must be a complete path, docker mounts do not support relatve paths.
+   + **--mount** since this is an AWS Lambda image there really is no *local* file storage per-se; to clarify, once an image has been published in ECR it is immutable. This argument binds a local directory to the image mount point **dst=/processed** this mount value is necessary for local csv file delivery and should not be modified. The **src=/some-full/host-directory** can be any path on the local system, it must be a complete path, docker mounts do not support relatve paths.
    + **--platform linux/amd64** this is the base platform for the base AWS ECR Image, this value should not be changed either.
    + **-p 9000:8080** is the port forwarding argument for the running image, though I haven't gone through the AWS ECR Image source, I suspect the container may have a hard dependency on port **8080**
    + **pge:test** is the tag that will be assigned to the running container, this can be any value.
     Now that we have the image running, we can invoke the API.
 
-   Here is where the invocaiton pattern differs between local Lambda and APIGW/ECR.  
+   The invocaiton pattern varies between local Lambda and APIGW/ECR.  
 3. The solution uses JWT for API Authorization, so we need to get a token
    ```
    curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"httpMethod":"POST","path":"/token","headers":{"Authorization":"Basic dGVzdDpzdXBlcnNlY3JldA=="}}'
    ```
    Argument break-down:
     
-    + The function uri is really like that in the real-world, APIGW Proxy Integration simplifies this for us, however we are in Lambda territory.
-    + **-d** APIGW Proxy Integration invokes the Lambda only via POST, notice the uri does not have a resource path, thats because the posted APIGatewayEvent payload is what the Lambda uses.
+    + The Lambda uri is quite different from what we normally see in a Rest API, APIGW Proxy Integration abstracts quite a bit for us.
+    + **-d** APIGW Proxy Integration invokes the Lambda only via POST, notice the uri does not have a resource path, because the posted APIGatewayEvent payload is what the Lambda uses.
     + **Basic dGVzdDpzdXBlcnNlY3JldA==** is the Base64 encoded value for *user:secret*
    The response will be:
    ```
@@ -129,7 +129,7 @@ From the local repository root directory:
    ```
    
 #### Invoking AWS APIGateway API
-I used Terraform to provision the Rest API in AWS, although the target environment differs, the same Docker file was used to build the Lambda image and publish into ECR.
+I used Terraform to provision the Rest API in AWS, although the target environments differ, the same Docker file was used to build the Lambda image and publish into ECR.
 
 Invoking the APIGateway Rest API follows the same workflow used for the local Lambda.
 
