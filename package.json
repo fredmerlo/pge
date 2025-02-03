@@ -1,0 +1,32 @@
+{
+  "name": "pge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "buildLambda": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
+    "@types/hapi__hapi": "^20.0.13",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.0",
+    "esbuild": "^0.24.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.740.0",
+    "@hapi/basic": "^7.0.2",
+    "@hapi/hapi": "^21.3.12",
+    "@hapi/jwt": "^3.2.0",
+    "@hapi/log": "^2.0.1",
+    "@hapi/wreck": "^18.1.0",
+    "json-2-csv": "^5.5.8",
+    "npm": "^11.1.0"
+  }
+}
