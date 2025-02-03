@@ -42,7 +42,7 @@
 Though we gain much with this approach, there are some nuances worth noting.
 
 + The primary target operating environment for AWS Lambda images is API Gateway with ECR
-+ There is a noticable higher technical complexity when usnig Lambda images.
++ There is a noticably elevated technical complexity when usnig Lambda images.
 + There are slight variations when invoking the Rest API locally.
 
 ### The Techinical Stuff
@@ -66,9 +66,9 @@ After cloning the repository:
    ```
    npm run test
    ```
-   The output is verbose, as intended, and there will be a few stack traces. This is expected, several of tests check error boundaries and the integrated logger is doing it's job to display the error condition.
+   The output is verbose, as intended, and there will be a few stack traces. This is expected, several tests check error boundaries and the integrated logger is doing it's job to display the error condition.
 
-4. Upon completion the test result summary should display:
+4. Upon completion the test result summary will display:
    ```
    Test Suites: 4 passed, 4 total
    Tests:       13 passed, 13 total
@@ -97,33 +97,62 @@ From the local repository root directory:
    + **--platform linux/amd64** this is the base platform for the base AWS ECR Image, this value should not be changed either.
    + **-p 9000:8080** is the port forwarding argument for the running image, though I haven't gone through the AWS ECR Image source, I suspect the container may have a hard dependency on port **8080**
    + **pge:test** is the tag that will be assigned to the running container, this can be any value.
-
-
     Now that we have the image running, we can invoke the API.
 
-    Here is where the invocaiton pattern differs between local Lambda and APIGW/ECR.
-    
-    1. The solution uses JWT for API Authorization, so we need to get a token
-       ```
-       curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"httpMethod":"POST","path":"/token","headers":{"Authorization":"Basic dGVzdDpzdXBlcnNlY3JldA=="}}'
-       ```
-    Argument break-down:
+   Here is where the invocaiton pattern differs between local Lambda and APIGW/ECR.  
+3. The solution uses JWT for API Authorization, so we need to get a token
+   ```
+   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"httpMethod":"POST","path":"/token","headers":{"Authorization":"Basic dGVzdDpzdXBlcnNlY3JldA=="}}'
+   ```
+   Argument break-down:
     
     + The function uri is really like that in the real-world, APIGW Proxy Integration simplifies this for us, however we are in Lambda territory.
     + **-d** APIGW Proxy Integration invokes the Lambda only via POST, notice the uri does not have a resource path, thats because the posted APIGatewayEvent payload is what the Lambda uses.
     + **Basic dGVzdDpzdXBlcnNlY3JldA==** is the Base64 encoded value for *user:secret*
-  The response will be:
-      ```
-      {"statusCode":200,"headers":{"content-type":"application/json; charset=utf-8","cache-control":"no-cache","content-length":260,"date":"Mon, 03 Feb 2025 17:13:48 GMT","connection":"keep-alive"},"body":"{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMwMDgsImlhdCI6MTczODYwMjgyOH0.ac38kE_0Ct-evDzM2WLfpcXctOAIokDqWAS17fdkRwk\"}"}
-      ```
-      There's our JWT token.
-  
+   The response will be:
+   ```
+   {"statusCode":200,"headers":{"content-type":"application/json; charset=utf-8","cache-control":"no-cache","content-length":260,"date":"Mon, 03 Feb 2025 17:13:48 GMT","connection":"keep-alive"},"body":"{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMwMDgsImlhdCI6MTczODYwMjgyOH0.ac38kE_0Ct-evDzM2WLfpcXctOAIokDqWAS17fdkRwk\"}"}
+   ```
+   There's our JWT token.
+4. Now we copy the token invoke the station data API
+   ```
+   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"path":"/","headers":{"Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMyODEsImlhdCI6MTczODYwMzEwMX0.wqURjtjzXLK4sQkNN78zQb_ivuH178HP6xn9tquBhYQ"}}'
+   ```
+   And the response:
+   ```
+   {"statusCode":200,"headers":{"content-type":"application/json; charset=utf-8","cache-control":"no-cache","content-length":506,"accept-ranges":"bytes","date":"Mon, 03 Feb 2025 17:19:56 GMT","connection":"keep-alive"},"body":"{\"csv\":\"eightd_has_key_dispenser,capacity,electric_bike_surcharge_waiver,station_type,lon,name,region_id,short_name,lat,has_kiosk,externalId,stationId,legacyId\\nfalse,3,false,classic,-73.9995126,Congress St & Hicks St,71,4497.09,40.6893952,true,b516fedb-3ced-4683-8c17-7e5f6dadf04d,b516fedb-3ced-4683-8c17-7e5f6dadf04d,undefined\\nfalse,3,false,classic,-73.99807110428809,8 Ave & W 24 St,71,6224.06,40.74591072834279,true,1d440638-ec50-4ccb-9a82-0e3247a87c63,1d440638-ec50-4ccb-9a82-0e3247a87c63,undefined\"}"}
+   ```
+5. The processed stations CSV file will be located at the mount point directory.
+   ```
+   ls /Users/fredmerlo/development/pge/data
+   data.csv
+   ```
+   
+#### Invoking AWS APIGateway API
+I used Terraform to provision the Rest API in AWS, although the target environment differs, the same Docker file was used to build the Lambda image and publish into ECR.
 
-   2. Now we copy the token invoke the station data API
-      ```
-      curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"path":"/","headers":{"Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMyODEsImlhdCI6MTczODYwMzEwMX0.wqURjtjzXLK4sQkNN78zQb_ivuH178HP6xn9tquBhYQ"}}'
-      ```
-      And the response:
-      ```
-      {"statusCode":200,"headers":{"content-type":"application/json; charset=utf-8","cache-control":"no-cache","content-length":506,"accept-ranges":"bytes","date":"Mon, 03 Feb 2025 17:19:56 GMT","connection":"keep-alive"},"body":"{\"csv\":\"eightd_has_key_dispenser,capacity,electric_bike_surcharge_waiver,station_type,lon,name,region_id,short_name,lat,has_kiosk,externalId,stationId,legacyId\\nfalse,3,false,classic,-73.9995126,Congress St & Hicks St,71,4497.09,40.6893952,true,b516fedb-3ced-4683-8c17-7e5f6dadf04d,b516fedb-3ced-4683-8c17-7e5f6dadf04d,undefined\\nfalse,3,false,classic,-73.99807110428809,8 Ave & W 24 St,71,6224.06,40.74591072834279,true,1d440638-ec50-4ccb-9a82-0e3247a87c63,1d440638-ec50-4ccb-9a82-0e3247a87c63,undefined\"}"}
-      ```
+Invoking the APIGateway Rest API follows the same workflow used for the local Lambda.
+
+1. Get the authorization token, no need to Base64 encode the user:secret these can be provided via request headers.
+   ```
+   curl -X POST -u "test:supersecret" "https://iaoe8o5c0e.execute-api.us-east-1.amazonaws.com/pge/token"
+   ```
+   The response:
+   ```
+   {"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDc0MjAsImlhdCI6MTczODYwNzI0MH0.HV72yn7Iq_CVDu6AbbaPSROFbjQiZPlAgKHaT4VL0Aw"}
+   ```
+2. Invoke the station data API
+   ```
+   curl "https://iaoe8o5c0e.execute-api.us-east-1.amazonaws.com/pge/data" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDc3ODMsImlhdCI6MTczODYwNzYwM30.GeBrZcVr7kek7ddVGnl_zN5N1Vl0fgZImc4GHr6ZAC0"
+   ```
+   The response:
+   ```
+   {"csv":"capacity,has_kiosk,short_name,eightd_has_key_dispenser,lat,region_id,electric_bike_surcharge_waiver,station_type,lon,name,externalId,stationId,legacyId\n3,true,4497.09,false,40.6893952,71,false,classic,-73.9995126,Congress St & Hicks St,b516fedb-3ced-4683-8c17-7e5f6dadf04d,b516fedb-3ced-4683-8c17-7e5f6dadf04d,undefined\n3,true,6224.06,false,40.74591072834279,71,false,classic,-73.99807110428809,8 Ave & W 24 St,1d440638-ec50-4ccb-9a82-0e3247a87c63,1d440638-ec50-4ccb-9a82-0e3247a87c63,undefined"}
+   ```
+3. The processed stations CSV is located in the S3 bucket
+   ```
+   aws s3 ls pge-data-bucket
+   2025-02-03 12:33:56        494 data.csv
+   ```
+
+
