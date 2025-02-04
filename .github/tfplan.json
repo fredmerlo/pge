@@ -1,6 +1,6 @@
 {
   "format_version": "1.2",
-  "terraform_version": "1.10.5",
+  "terraform_version": "1.8.5",
   "variables": {
     "lambda_secret": {
       "value": null
@@ -693,12 +693,15 @@
                   }
                 ],
                 "force_remove": false,
+                "id": "sha256:015596983bac83d5e53cff87a113552ad187fc8158a9fb01bd7bfe2c77309c2d900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
+                "image_id": "sha256:015596983bac83d5e53cff87a113552ad187fc8158a9fb01bd7bfe2c77309c2d",
                 "keep_locally": false,
                 "name": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
                 "platform": null,
                 "pull_triggers": null,
+                "repo_digest": "",
                 "triggers": {
-                  "dir_sha": "2aaccee290be613d35b65f4592921b822a084b5b"
+                  "dir_sha": "eba97a0aa08bb5719fba2a7a7fe7a2215d10b57d"
                 }
               },
               "sensitive_values": {
@@ -726,11 +729,13 @@
               "provider_name": "registry.terraform.io/kreuzwerker/docker",
               "schema_version": 0,
               "values": {
+                "id": "sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
                 "insecure_skip_verify": false,
                 "keep_remotely": false,
                 "name": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
+                "sha256_digest": "sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
                 "triggers": {
-                  "dir_sha": "2aaccee290be613d35b65f4592921b822a084b5b"
+                  "dir_sha": "eba97a0aa08bb5719fba2a7a7fe7a2215d10b57d"
                 }
               },
               "sensitive_values": {
@@ -904,7 +909,7 @@
                   "x86_64"
                 ],
                 "arn": "arn:aws:lambda:us-east-1:900357929763:function:pge-lambda-with-docker-build-from-ecr",
-                "code_sha256": "ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+                "code_sha256": "42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
                 "code_signing_config_arn": "",
                 "dead_letter_config": [],
                 "description": "PGE Test",
@@ -926,8 +931,10 @@
                 "handler": "",
                 "id": "pge-lambda-with-docker-build-from-ecr",
                 "image_config": [],
+                "image_uri": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr@sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
                 "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:900357929763:function:pge-lambda-with-docker-build-from-ecr/invocations",
                 "kms_key_arn": "",
+                "last_modified": "2025-02-04T11:49:21.000+0000",
                 "layers": [],
                 "logging_config": [
                   {
@@ -2212,8 +2219,7 @@
       "provider_name": "registry.terraform.io/kreuzwerker/docker",
       "change": {
         "actions": [
-          "create",
-          "delete"
+          "no-op"
         ],
         "before": {
           "build": [
@@ -2260,15 +2266,15 @@
             }
           ],
           "force_remove": false,
-          "id": "sha256:1e7ac2d8ed847735203c373b9d3fa32bdb7ade4edfb5f5c5762ca328b6ee7de9900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
-          "image_id": "sha256:1e7ac2d8ed847735203c373b9d3fa32bdb7ade4edfb5f5c5762ca328b6ee7de9",
+          "id": "sha256:015596983bac83d5e53cff87a113552ad187fc8158a9fb01bd7bfe2c77309c2d900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
+          "image_id": "sha256:015596983bac83d5e53cff87a113552ad187fc8158a9fb01bd7bfe2c77309c2d",
           "keep_locally": false,
           "name": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
           "platform": null,
           "pull_triggers": null,
           "repo_digest": "",
           "triggers": {
-            "dir_sha": "bed82bf5488988939d48d00bbdd1e5836ef5da90"
+            "dir_sha": "eba97a0aa08bb5719fba2a7a7fe7a2215d10b57d"
           }
         },
         "after": {
@@ -2316,33 +2322,18 @@
             }
           ],
           "force_remove": false,
+          "id": "sha256:015596983bac83d5e53cff87a113552ad187fc8158a9fb01bd7bfe2c77309c2d900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
+          "image_id": "sha256:015596983bac83d5e53cff87a113552ad187fc8158a9fb01bd7bfe2c77309c2d",
           "keep_locally": false,
           "name": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
           "platform": null,
           "pull_triggers": null,
+          "repo_digest": "",
           "triggers": {
-            "dir_sha": "2aaccee290be613d35b65f4592921b822a084b5b"
+            "dir_sha": "eba97a0aa08bb5719fba2a7a7fe7a2215d10b57d"
           }
         },
-        "after_unknown": {
-          "build": [
-            {
-              "auth_config": [],
-              "build_args": {},
-              "cache_from": [
-                false
-              ],
-              "extra_hosts": [],
-              "security_opt": [],
-              "tag": [],
-              "ulimit": []
-            }
-          ],
-          "id": true,
-          "image_id": true,
-          "repo_digest": true,
-          "triggers": {}
-        },
+        "after_unknown": {},
         "before_sensitive": {
           "build": [
             {
@@ -2374,14 +2365,8 @@
             }
           ],
           "triggers": {}
-        },
-        "replace_paths": [
-          [
-            "triggers"
-          ]
-        ]
-      },
-      "action_reason": "replace_because_cannot_update"
+        }
+      }
     },
     {
       "address": "module.docker_build_from_ecr.docker_registry_image.this",
@@ -2392,45 +2377,36 @@
       "provider_name": "registry.terraform.io/kreuzwerker/docker",
       "change": {
         "actions": [
-          "create",
-          "delete"
+          "no-op"
         ],
         "before": {
-          "id": "sha256:ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+          "id": "sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
           "insecure_skip_verify": false,
           "keep_remotely": false,
           "name": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
-          "sha256_digest": "sha256:ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+          "sha256_digest": "sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
           "triggers": {
-            "dir_sha": "bed82bf5488988939d48d00bbdd1e5836ef5da90"
+            "dir_sha": "eba97a0aa08bb5719fba2a7a7fe7a2215d10b57d"
           }
         },
         "after": {
+          "id": "sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
           "insecure_skip_verify": false,
           "keep_remotely": false,
           "name": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
+          "sha256_digest": "sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
           "triggers": {
-            "dir_sha": "2aaccee290be613d35b65f4592921b822a084b5b"
+            "dir_sha": "eba97a0aa08bb5719fba2a7a7fe7a2215d10b57d"
           }
         },
-        "after_unknown": {
-          "id": true,
-          "sha256_digest": true,
-          "triggers": {}
-        },
+        "after_unknown": {},
         "before_sensitive": {
           "triggers": {}
         },
         "after_sensitive": {
           "triggers": {}
-        },
-        "replace_paths": [
-          [
-            "triggers"
-          ]
-        ]
-      },
-      "action_reason": "replace_because_cannot_update"
+        }
+      }
     },
     {
       "address": "module.ecr.aws_ecr_repository.this[0]",
@@ -2715,14 +2691,14 @@
       "provider_name": "registry.terraform.io/hashicorp/aws",
       "change": {
         "actions": [
-          "update"
+          "no-op"
         ],
         "before": {
           "architectures": [
             "x86_64"
           ],
           "arn": "arn:aws:lambda:us-east-1:900357929763:function:pge-lambda-with-docker-build-from-ecr",
-          "code_sha256": "ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+          "code_sha256": "42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
           "code_signing_config_arn": "",
           "dead_letter_config": [],
           "description": "PGE Test",
@@ -2744,10 +2720,10 @@
           "handler": "",
           "id": "pge-lambda-with-docker-build-from-ecr",
           "image_config": [],
-          "image_uri": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr@sha256:ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+          "image_uri": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr@sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
           "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:900357929763:function:pge-lambda-with-docker-build-from-ecr/invocations",
           "kms_key_arn": "",
-          "last_modified": "2025-02-04T06:56:54.000+0000",
+          "last_modified": "2025-02-04T11:49:21.000+0000",
           "layers": [],
           "logging_config": [
             {
@@ -2797,7 +2773,7 @@
             "x86_64"
           ],
           "arn": "arn:aws:lambda:us-east-1:900357929763:function:pge-lambda-with-docker-build-from-ecr",
-          "code_sha256": "ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+          "code_sha256": "42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
           "code_signing_config_arn": "",
           "dead_letter_config": [],
           "description": "PGE Test",
@@ -2819,8 +2795,10 @@
           "handler": "",
           "id": "pge-lambda-with-docker-build-from-ecr",
           "image_config": [],
+          "image_uri": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr@sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
           "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:900357929763:function:pge-lambda-with-docker-build-from-ecr/invocations",
           "kms_key_arn": "",
+          "last_modified": "2025-02-04T11:49:21.000+0000",
           "layers": [],
           "logging_config": [
             {
@@ -2865,35 +2843,7 @@
           "version": "$LATEST",
           "vpc_config": []
         },
-        "after_unknown": {
-          "architectures": [
-            false
-          ],
-          "dead_letter_config": [],
-          "environment": [
-            {
-              "variables": {}
-            }
-          ],
-          "ephemeral_storage": [
-            {}
-          ],
-          "file_system_config": [],
-          "image_config": [],
-          "image_uri": true,
-          "last_modified": true,
-          "layers": [],
-          "logging_config": [
-            {}
-          ],
-          "snap_start": [],
-          "tags": {},
-          "tags_all": {},
-          "tracing_config": [
-            {}
-          ],
-          "vpc_config": []
-        },
+        "after_unknown": {},
         "before_sensitive": {
           "architectures": [
             false
@@ -2953,7 +2903,7 @@
   ],
   "prior_state": {
     "format_version": "1.0",
-    "terraform_version": "1.10.5",
+    "terraform_version": "1.8.5",
     "values": {
       "root_module": {
         "resources": [
@@ -2966,9 +2916,9 @@
             "schema_version": 0,
             "values": {
               "account_id": "900357929763",
-              "arn": "arn:aws:sts::900357929763:assumed-role/pge_github_role/GitHubActions",
+              "arn": "arn:aws:iam::900357929763:root",
               "id": "900357929763",
-              "user_id": "AROA5DIMDXMR3GARSFYMJ:GitHubActions"
+              "user_id": "900357929763"
             },
             "sensitive_values": {}
           },
@@ -2980,10 +2930,10 @@
             "provider_name": "registry.terraform.io/hashicorp/aws",
             "schema_version": 0,
             "values": {
-              "authorization_token": "QVdTOmV5SndZWGxzYjJGa0lqb2ljRWRZYWpWelZsTkhRWEpvT0RreFFuZFBLMlJ2T1VSWE9VNXFla3BJYVZGWVNVeHlPRkZMTDBkaFp6TnpSVWh1V0dsb1VscFFTRXBzZDFwU1VsZ3dTbXB4U0dOU1UyRkhXblJFYldSbFRHSnpkVWRwVEVReGIwUkxVekZNUVZveVpGQjVjMUpSYUZKbmNFTnhSVkI2WWt0SU5UZ3JSazU1TUcxNVUxQlpNamhoYVhoeVZXbGFWREpxTTA5dFVWSndjblp0Y0U1NmJHWkJlRVJKVFRoaU5sRXdNME5NUjJkcEwweFVUR2x4T1dOWFpVaHlZVUVyZWtocVMyeGtkMDVyWW1aUVRFZHFZVk5xYUdSTVNHWkllblo1ZDBKSU9YWm5URkJPYjBsNVJFdHJNMFpvZDJac2NEVXhaVmMyV200elpHdHpaelJvVTFOeVl5OWxVM0pHWWxKR1QxTlZZelZ5U1RVNU5ETmhMekZJT0hoSlZHdEJXbmRMWVRrd2RGRnhPV05ZVGtaMFp6SmhhSEU1WnpCNVJXdHJRbkJ5Y1RkNU5qZFBXRFpvYXk5NVExaE1jazFzVGtGbmNWQnVlV1JHVTNGR1FqQlRNa1JFUkdkVlpVUmhOR3hoUkZCVmVHaHhXR3M0UjJSRU9GaFNaSEpLTHpZMVRHdDZkRTlpU25GblZEZDBXa0ZEYkZWSVFWcE1ka2xUTnpneWRYVnhSRGwwYzNoU1YwcFhVa000VlVZMk9IazVZa3hOVEdkbVIwWTBTM2RSYjI4MFNUWlJiVkJsUjNkVlRtMDVZUzlMV1dKUVNDOVZlVE5ZWWtNMFN6QkZXV1UzTW0xRlVXTmlOREJ6ZEhZMFFWTjVhbGQzYkVnMU5FVk1ZVlZ1WkVObk5VNVVjak5LYmprMVRIbFlTREJGYjI1cFNDczNWbVV4UzBRckwzRnRjREUxZEVveWRVUk9halpKUW00NFRFOWthVzlxUkc1eU5EaHNLemN6V2pGc1VGaEtUMjluTkd3clJVaDJWMlJZYUV0a1JYUklNMjlyTjI4d1oyeE9TV2hQWjFCeVNEUXpNVGhSVDNNelFra3djMk5tWWxCcFlXSlFVWFF4YVhoT1IzaERabFYzYjJ4MFNYZGpNVFZLYmtSaE4wRldhMVpMY2tWWlYweFNkamRJYUU1NVZqVkNWMFI2WkRWRVJrODVLMjB3UVVSc1RGSXZZMGhrTVZKMllqUkpOalprTDJ0M1UyUTJkM2hqT1U1eFYwZGxiV1JNV1ZFcmVXOVpabmhvUVV4Sk9ERjJjRFpuYmpCS1EyNTFRM28yY0RoREswZEpORVZxU2pKbE1YTm9VemhCUlhsclIzQlllRGhhV2xOSmQwdHBWalJUT0d4WWNuRkdLMkpuV2tGMk56Tk5iREpKZFRac1FsZE1WbEZMVURaWVFYa3dTbGxNYzJaRGJXSlpRWFl2WVdoMVFsVTBWM0I2T1ZGamFXZHlUVWhqU1RaMWEzWnJTRTFxYUU1dVYxaE1LMUoxVUZoMmJGaHRPV0ZxU1RKUFZFOUNVbGRJUnpoTU1rVm5SWEF2WjJad1ZpOHpjeXRMU1VaVlJYZFhlR2xpTWtaNE5sWkNjVlJrZVZZMFYyMUVRWFI0TkhGc1VUUkdkbHAxWkROMmJXbExTREZyT1U5S1RubFBaWGRRWm5Nek5WaEpkVk4yU1hwcE56SmpSSFZoUkdZck1teHdUMmwxU0d4RU9UaFJUMHg2ZWpCbWRFa3libWgyVWpKSFZIVnVTRUoyVFhWRVQzZE9PREpXWWpWYVUzZFpPRXhRY0ZaWGFXbE9abmR5Y1ROUFIwcFJNVzV4TlU5T09UWnpjMGN3UkhCdWNraFVTbU5XZVV0SE9XaENNR1o1UkhwV1dWVjNRM2hwV2s1YWNrODVjbXhLYzJkRVoxSXlaekJQVTNGQmNFRmlZMnRuTWxOM1JIbG5WVTFDY2tGVFdWZEdXR0Z0ZFZkaFRqRnVNRzVQVUVOa1FTdGFhMmgzYkVaMlFrSllUM1ZOZGt0WmQyOTVSRWRHTVhVMlMxUTFaVWxhWTIxMlFsSXpVWGxEYkZwcFRVSTROamR4ZWtkQlJVUTJkMjlpZFhSamFEVkRWVlJXVTA5dGFWTlhkelpNWjFGa2RIRXJjVFZqU0U1VFVHOUNSMm93VjBvdlFreFNPVGRFU0RBM1pGb3lOV1pTYXpsU1UybG5WWE5oYW10dkwzWkRjSEJpTURoNU5reFdLek13T0hWNk1WSjZNV0kxVWs1UWNUZGhaM1pxUW1KWVFuZG9VVzl0WmxFemNtVmtRV3hCV2pSeFdHSlBNVGR5YUdkU1ZHNUpjREZvTnpjeVZsRk1PRlk1YlN0Q1VUSlNUV050VFhGdmFtSTJkRlk1Um5GVE4xQnNkSFk1VFZoV2RHWkNjRXB0WjNNeVZucGhXamgzVm5sek5qZzRaVGc1ZERKeWVtTkxPVU4wV1Zoa1dIVXdTVlJQYjAwMU5EbDRkSEYxTUU1UVZUUXJZakIxY2pkeGQxSnplSFJCVVVOS2REaEVSR2RsZUZRM2IyNU9NWHBxTDNwU2IzWlBlbXAxY2tzdlJIUjFWbk5HVlM5bmRFaHZVMEpPZURkSk16TTNVVkZ5TTFOTVpXWldPVEExWmlzd2JVTTJUbEF2WkU1aWMySXZaMHhKSzFJMVMxTmxhbTFJY2xsUlBTSXNJbVJoZEdGclpYa2lPaUpCVVVWQ1FVaG9kMjB3V1dGSlUwcGxVblJLYlRWdU1VYzJkWEZsWld0WWRXOVlXRkJsTlZWR1kyVTVVbkU0THpFMGQwRkJRVWcwZDJaQldVcExiMXBKYUhaalRrRlJZMGR2UnpoM1lsRkpRa0ZFUW05Q1oydHhhR3RwUnpsM01FSkNkMFYzU0dkWlNsbEpXa2xCVjFWRVFrRkZkVTFDUlVWRVRrWkNRVzQxWWl0SGVERlpjbkZ5VG5kSlFrVkpRVGR5UmxkSmNYSXhaVll3YzI5QmFEVnBWbk5FWlZReWVFRkJRVUY1UzBaWU4xTndOREpRWms1eU5EY3ZWbW81UXpWcFZrdFBkeXRyU0ZoclFVUjZjSEpDTmt4TlNFOU1jek42UjFsTlNrbzRQU0lzSW5abGNuTnBiMjRpT2lJeUlpd2lkSGx3WlNJNklrUkJWRUZmUzBWWklpd2laWGh3YVhKaGRHbHZiaUk2TVRjek9EY3hNVGt3T0gwPQ==",
-              "expires_at": "2025-02-04T23:31:48Z",
+              "authorization_token": "QVdTOmV5SndZWGxzYjJGa0lqb2lObU5EYWxwaVNXc3pZVFJGYVRKcFlURnRhVVZCWmxOQkszVTFVVzVTVlhkUlZXWkxZV2RKY0RRMFJESmxNM0k0YXpsSlkwNTRNbTltYjJaelNGRlNVRWR1U1N0WU5WRmFhRWROVkdoWWRYZHZkemRvVFVoSFQxSlZXakZUVEZoM1VURklhVE42ZVhvdlQxTjJOMDFPYjBWclRtWTJPWEF6TTI5RFpYUTBXbUZLS3pVdlFXYzNjVEJZVFRrMU0waHVTMU42ZUdnd2Jtd3lNVGxvY1VGdFRVWlFMM3BwUzBSMlVDc3JTV0oyV2xkb1NWVm9aMGR3T0ZSNlZERnpSMHBTY0hBeVRYZERTRU5LWWxwcFUzQlRSM0l2UzJkdGNHSTNiVnBTVUVwV1FWVTBTM05CUzI5Sk1qRnlWVVJDY0c5aU5rRm1ZMk5WZFZKVGRVVnZiSEZFVDFOR01ISmxTakprWkUxTVZ5OXBRV0YxVEVkVVUwRkdaVmRXWkhRd2RqQTFhbVp2Y3pGUlZrTjRhMGdyVTBSWEt6QmFTbE5tTDFkYVFrRTJZVE5QZDAxNFEyRlhUMVZRZDBFeE1tWTRWa2g2TXpCeWEySktWbGd4U1VkUkwxaE5WRzFxTXpsUU5tWnBMMUpYVVZoSVMxUndVV1pyUXpObWNWZzFOMmxQYlVWRmJGcHJlR1pFUWxGb1VWcHlUV0pqV21ZelNISkhPVzB3Y25WdVkzRmtVMmhsVFU4MGRscFpSM0JETkhWMFNVbFBZVXhDZEZaMmR6QmFUbkJVWlRoUmRUbE9ObVZqVUVGTFFVaENTM2N5VFhaamRpdDFWVTVFVWtsNFEzUTNkekFyY2pOWVpVNXhZMmhLUWxoblNEWXpSRWxhZVdsdFZFVnpORk5oVTNaUFF6RTNXVFE1VW1OVFRreHlNelk0ZG1wbFdpODBiMEZKVG5wYVdVNVNVVk5VY2toME1tRldiVmRSTUZCTVRVNHhaVTVpY1N0b1VWcGFURWN3YzJ0WlFWRm1iMDlKT1ZsSU5HMU5Ra1pRTUZGaFVGbEVhRkpMZDJrMmNYbG1aRFZrUm1oNGVWTmpjelE1ZFM5RFVYSmhOV05aYWxWeFR6RnJRV0o1YmpsU1NrSTNkbkpxWjBabGNXUk5XVEJvV0haMlpUbERORmgxTkhWdWVXVk9TMUYyUVdaelkyRkZZMkpTWVZKVUsxTTVTaXRYU0RCaFFVWlFMMGhyU2tWQlkwMVVhWGN4TVVGR1NFdE5ZMEU1VDNCcVlrbFZUekZQY0VoaVdHa3lNVlZKYkRodlEwOW1XRk5LWjNscmNGWktUVFpzVTBJeFQwMHZWVEZQZWxsRFEycEZZM2cyUkhZM09FMXhSRlZaV0Rnd2QzTlZVekZYVkZSNFJuSkRlbTlJYlhFeVVYSklNMUZMZGpGRFpIZHNUMUpzTWt4aWVISlVhR1pDTVcxNlUyeENObXRxUVN0R01rRm9SV0paU1dGaFVVeGtWa0pCYjNKQlRsaHVaVVJrVWt0Nll6Wmpja3B6VWpseEwybHRNMHgyU0RsV2FuTXpiRzV4T0RJMVZVOXVWVUpvV1ZFeU9HZEJTRzAwWms5R1pYVmxja0UzVUM5cmVYTXdVMWc0UmxSNFlWbExVWEZLUmtaWVpFcDFiVVJ4TVU1S1FXUTVTMDB4VFdGTE5WSlZhVTVQU0ZvdmNFNDRMMkpIYURkWldUY3ZMMVZNWXpSQlBUMGlMQ0prWVhSaGEyVjVJam9pUVZGRlFrRklhSGR0TUZsaFNWTktaVkowU20wMWJqRkhOblZ4WldWcldIVnZXRmhRWlRWVlJtTmxPVkp4T0M4eE5IZEJRVUZJTkhkbVFWbEtTMjlhU1doMlkwNUJVV05IYjBjNGQySlJTVUpCUkVKdlFtZHJjV2hyYVVjNWR6QkNRbmRGZDBobldVcFpTVnBKUVZkVlJFSkJSWFZOUWtWRlJFSnVObWhQZVZCbGRHMHJRVlZUU0RoUlNVSkZTVUUzZGtwd1lpdDVNRVphUm14dVUwVkplRkZPUzJ0dWQxWnRSMWQyY0ZGeWVrcEdUalJXWjBGQldESnRiUzl2VUZaMlREQlBhRUpGZVhkTk9ETTBURGhRYWxGdFZXSlhWRlpXZEVWdlZXeFRTVDBpTENKMlpYSnphVzl1SWpvaU1pSXNJblI1Y0dVaU9pSkVRVlJCWDB0RldTSXNJbVY0Y0dseVlYUnBiMjRpT2pFM016ZzNNVE13TURoOQ==",
+              "expires_at": "2025-02-04T23:50:08Z",
               "id": "us-east-1",
-              "password": "eyJwYXlsb2FkIjoicEdYajVzVlNHQXJoODkxQndPK2RvOURXOU5qekpIaVFYSUxyOFFLL0dhZzNzRUhuWGloUlpQSEpsd1pSUlgwSmpxSGNSU2FHWnREbWRlTGJzdUdpTEQxb0RLUzFMQVoyZFB5c1JRaFJncENxRVB6YktINTgrRk55MG15U1BZMjhhaXhyVWlaVDJqM09tUVJwcnZtcE56bGZBeERJTThiNlEwM0NMR2dpL0xUTGlxOWNXZUhyYUErekhqS2xkd05rYmZQTEdqYVNqaGRMSGZIenZ5d0JIOXZnTFBOb0l5REtrM0Zod2ZscDUxZVc2Wm4zZGtzZzRoU1NyYy9lU3JGYlJGT1NVYzVySTU5NDNhLzFIOHhJVGtBWndLYTkwdFFxOWNYTkZ0ZzJhaHE5ZzB5RWtrQnBycTd5NjdPWDZoay95Q1hMck1sTkFncVBueWRGU3FGQjBTMkRERGdVZURhNGxhRFBVeGhxWGs4R2REOFhSZHJKLzY1TGt6dE9iSnFnVDd0WkFDbFVIQVpMdklTNzgydXVxRDl0c3hSV0pXUkM4VUY2OHk5YkxNTGdmR0Y0S3dRb280STZRbVBlR3dVTm05YS9LWWJQSC9VeTNYYkM0SzBFWWU3Mm1FUWNiNDBzdHY0QVN5ald3bEg1NEVMYVVuZENnNU5UcjNKbjk1THlYSDBFb25pSCs3VmUxS0QrL3FtcDE1dEoydUROajZJQm44TE9kaW9qRG5yNDhsKzczWjFsUFhKT29nNGwrRUh2V2RYaEtkRXRIM29rN28wZ2xOSWhPZ1BySDQzMThRT3MzQkkwc2NmYlBpYWJQUXQxaXhOR3hDZlV3b2x0SXdjMTVKbkRhN0FWa1ZLckVZV0xSdjdIaE55VjVCV0R6ZDVERk85K20wQURsTFIvY0hkMVJ2YjRJNjZkL2t3U2Q2d3hjOU5xV0dlbWRMWVEreW9ZZnhoQUxJODF2cDZnbjBKQ251Q3o2cDhDK0dJNEVqSjJlMXNoUzhBRXlrR3BYeDhaWlNJd0tpVjRTOGxYcnFGK2JnWkF2NzNNbDJJdTZsQldMVlFLUDZYQXkwSllMc2ZDbWJZQXYvYWh1QlU0V3B6OVFjaWdyTUhjSTZ1a3ZrSE1qaE5uV1hMK1J1UFh2bFhtOWFqSTJPVE9CUldIRzhMMkVnRXAvZ2ZwVi8zcytLSUZVRXdXeGliMkZ4NlZCcVRkeVY0V21EQXR4NHFsUTRGdlp1ZDN2bWlLSDFrOU9KTnlPZXdQZnMzNVhJdVN2SXppNzJjRHVhRGYrMmxwT2l1SGxEOThRT0x6ejBmdEkybmh2UjJHVHVuSEJ2TXVET3dOODJWYjVaU3dZOExQcFZXaWlOZndycTNPR0pRMW5xNU9OOTZzc0cwRHBuckhUSmNWeUtHOWhCMGZ5RHpWWVV3Q3hpWk5ack85cmxKc2dEZ1IyZzBPU3FBcEFiY2tnMlN3RHlnVU1CckFTWVdGWGFtdVdhTjFuMG5PUENkQStaa2h3bEZ2QkJYT3VNdktZd295REdGMXU2S1Q1ZUlaY212QlIzUXlDbFppTUI4NjdxekdBRUQ2d29idXRjaDVDVVRWU09taVNXdzZMZ1FkdHErcTVjSE5TUG9CR2owV0ovQkxSOTdESDA3ZFoyNWZSazlSU2lnVXNhamtvL3ZDcHBiMDh5NkxWKzMwOHV6MVJ6MWI1Uk5QcTdhZ3ZqQmJYQndoUW9tZlEzcmVkQWxBWjRxWGJPMTdyaGdSVG5JcDFoNzcyVlFMOFY5bStCUTJSTWNtTXFvamI2dFY5RnFTN1BsdHY5TVhWdGZCcEptZ3MyVnphWjh3VnlzNjg4ZTg5dDJyemNLOUN0WVhkWHUwSVRPb001NDl4dHF1ME5QVTQrYjB1cjdxd1JzeHRBUUNKdDhERGdleFQ3b25OMXpqL3pSb3ZPemp1cksvRHR1VnNGVS9ndEhvU0JOeDdJMzM3UVFyM1NMZWZWOTA1ZiswbUM2TlAvZE5ic2IvZ0xJK1I1S1Nlam1IcllRPSIsImRhdGFrZXkiOiJBUUVCQUhod20wWWFJU0plUnRKbTVuMUc2dXFlZWtYdW9YWFBlNVVGY2U5UnE4LzE0d0FBQUg0d2ZBWUpLb1pJaHZjTkFRY0dvRzh3YlFJQkFEQm9CZ2txaGtpRzl3MEJCd0V3SGdZSllJWklBV1VEQkFFdU1CRUVETkZCQW41YitHeDFZcnFyTndJQkVJQTdyRldJcXIxZVYwc29BaDVpVnNEZVQyeEFBQUF5S0ZYN1NwNDJQZk5yNDcvVmo5QzVpVktPdytrSFhrQUR6cHJCNkxNSE9MczN6R1lNSko4PSIsInZlcnNpb24iOiIyIiwidHlwZSI6IkRBVEFfS0VZIiwiZXhwaXJhdGlvbiI6MTczODcxMTkwOH0=",
+              "password": "eyJwYXlsb2FkIjoiNmNDalpiSWszYTRFaTJpYTFtaUVBZlNBK3U1UW5SVXdRVWZLYWdJcDQ0RDJlM3I4azlJY054Mm9mb2ZzSFFSUEduSStYNVFaaEdNVGhYdXdvdzdoTUhHT1JVWjFTTFh3UTFIaTN6eXovT1N2N01Ob0VrTmY2OXAzM29DZXQ0WmFKKzUvQWc3cTBYTTk1M0huS1N6eGgwbmwyMTlocUFtTUZQL3ppS0R2UCsrSWJ2WldoSVVoZ0dwOFR6VDFzR0pScHAyTXdDSENKYlppU3BTR3IvS2dtcGI3bVpSUEpWQVU0S3NBS29JMjFyVURCcG9iNkFmY2NVdVJTdUVvbHFET1NGMHJlSjJkZE1MVy9pQWF1TEdUU0FGZVdWZHQwdjA1amZvczFRVkN4a0grU0RXKzBaSlNmL1daQkE2YTNPd014Q2FXT1VQd0ExMmY4Vkh6MzBya2JKVlgxSUdRL1hNVG1qMzlQNmZpL1JXUVhIS1RwUWZrQzNmcVg1N2lPbUVFbFpreGZEQlFoUVpyTWJjWmYzSHJHOW0wcnVuY3FkU2hlTU80dlpZR3BDNHV0SUlPYUxCdFZ2dzBaTnBUZThRdTlONmVjUEFLQUhCS3cyTXZjdit1VU5EUkl4Q3Q3dzArcjNYZU5xY2hKQlhnSDYzRElaeWltVEVzNFNhU3ZPQzE3WTQ5UmNTTkxyMzY4dmplWi80b0FJTnpaWU5SUVNUckh0MmFWbVdRMFBMTU4xZU5icStoUVpaTEcwc2tZQVFmb09JOVlING1NQkZQMFFhUFlEaFJLd2k2cXlmZDVkRmh4eVNjczQ5dS9DUXJhNWNZalVxTzFrQWJ5bjlSSkI3dnJqZ0ZlcWRNWTBoWHZ2ZTlDNFh1NHVueWVOS1F2QWZzY2FFY2JSYVJUK1M5SitXSDBhQUZQL0hrSkVBY01UaXcxMUFGSEtNY0E5T3BqYklVTzFPcEhiWGkyMVVJbDhvQ09mWFNKZ3lrcFZKTTZsU0IxT00vVTFPellDQ2pFY3g2RHY3OE1xRFVZWDgwd3NVUzFXVFR4RnJDem9IbXEyUXJIM1FLdjFDZHdsT1JsMkxieHJUaGZCMW16U2xCNmtqQStGMkFoRWJZSWFhUUxkVkJBb3JBTlhuZURkUkt6YzZjckpzUjlxL2ltM0x2SDlWanMzbG5xODI1VU9uVUJoWVEyOGdBSG00Zk9GZXVlckE3UC9reXMwU1g4RlR4YVlLUXFKRkZYZEp1bURxMU5KQWQ5S00xTWFLNVJVaU5PSFovcE44L2JHaDdZWTcvL1VMYzRBPT0iLCJkYXRha2V5IjoiQVFFQkFIaHdtMFlhSVNKZVJ0Sm01bjFHNnVxZWVrWHVvWFhQZTVVRmNlOVJxOC8xNHdBQUFINHdmQVlKS29aSWh2Y05BUWNHb0c4d2JRSUJBREJvQmdrcWhraUc5dzBCQndFd0hnWUpZSVpJQVdVREJBRXVNQkVFREJuNmhPeVBldG0rQVVTSDhRSUJFSUE3dkpwYit5MEZaRmxuU0VJeFFOS2tud1ZtR1d2cFFyekpGTjRWZ0FBWDJtbS9vUFZ2TDBPaEJFeXdNODM0TDhQalFtVWJXVFZWdEVvVWxTST0iLCJ2ZXJzaW9uIjoiMiIsInR5cGUiOiJEQVRBX0tFWSIsImV4cGlyYXRpb24iOjE3Mzg3MTMwMDh9",
               "proxy_endpoint": "https://900357929763.dkr.ecr.us-east-1.amazonaws.com",
               "registry_id": null,
               "user_name": "AWS"
@@ -4196,9 +4146,9 @@
                 "schema_version": 0,
                 "values": {
                   "account_id": "900357929763",
-                  "arn": "arn:aws:sts::900357929763:assumed-role/pge_github_role/GitHubActions",
+                  "arn": "arn:aws:iam::900357929763:root",
                   "id": "900357929763",
-                  "user_id": "AROA5DIMDXMR3GARSFYMJ:GitHubActions"
+                  "user_id": "900357929763"
                 },
                 "sensitive_values": {}
               },
@@ -4269,15 +4219,15 @@
                     }
                   ],
                   "force_remove": false,
-                  "id": "sha256:1e7ac2d8ed847735203c373b9d3fa32bdb7ade4edfb5f5c5762ca328b6ee7de9900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
-                  "image_id": "sha256:1e7ac2d8ed847735203c373b9d3fa32bdb7ade4edfb5f5c5762ca328b6ee7de9",
+                  "id": "sha256:015596983bac83d5e53cff87a113552ad187fc8158a9fb01bd7bfe2c77309c2d900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
+                  "image_id": "sha256:015596983bac83d5e53cff87a113552ad187fc8158a9fb01bd7bfe2c77309c2d",
                   "keep_locally": false,
                   "name": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
                   "platform": null,
                   "pull_triggers": null,
                   "repo_digest": "",
                   "triggers": {
-                    "dir_sha": "bed82bf5488988939d48d00bbdd1e5836ef5da90"
+                    "dir_sha": "eba97a0aa08bb5719fba2a7a7fe7a2215d10b57d"
                   }
                 },
                 "sensitive_values": {
@@ -4315,13 +4265,13 @@
                 "provider_name": "registry.terraform.io/kreuzwerker/docker",
                 "schema_version": 0,
                 "values": {
-                  "id": "sha256:ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+                  "id": "sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
                   "insecure_skip_verify": false,
                   "keep_remotely": false,
                   "name": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr",
-                  "sha256_digest": "sha256:ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+                  "sha256_digest": "sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
                   "triggers": {
-                    "dir_sha": "bed82bf5488988939d48d00bbdd1e5836ef5da90"
+                    "dir_sha": "eba97a0aa08bb5719fba2a7a7fe7a2215d10b57d"
                   }
                 },
                 "sensitive_values": {
@@ -4353,9 +4303,9 @@
                 "schema_version": 0,
                 "values": {
                   "account_id": "900357929763",
-                  "arn": "arn:aws:sts::900357929763:assumed-role/pge_github_role/GitHubActions",
+                  "arn": "arn:aws:iam::900357929763:root",
                   "id": "900357929763",
-                  "user_id": "AROA5DIMDXMR3GARSFYMJ:GitHubActions"
+                  "user_id": "900357929763"
                 },
                 "sensitive_values": {}
               },
@@ -4627,9 +4577,9 @@
                 "schema_version": 0,
                 "values": {
                   "account_id": "900357929763",
-                  "arn": "arn:aws:sts::900357929763:assumed-role/pge_github_role/GitHubActions",
+                  "arn": "arn:aws:iam::900357929763:root",
                   "id": "900357929763",
-                  "user_id": "AROA5DIMDXMR3GARSFYMJ:GitHubActions"
+                  "user_id": "900357929763"
                 },
                 "sensitive_values": {}
               },
@@ -4896,7 +4846,7 @@
                     "x86_64"
                   ],
                   "arn": "arn:aws:lambda:us-east-1:900357929763:function:pge-lambda-with-docker-build-from-ecr",
-                  "code_sha256": "ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+                  "code_sha256": "42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
                   "code_signing_config_arn": "",
                   "dead_letter_config": [],
                   "description": "PGE Test",
@@ -4918,10 +4868,10 @@
                   "handler": "",
                   "id": "pge-lambda-with-docker-build-from-ecr",
                   "image_config": [],
-                  "image_uri": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr@sha256:ffa3963e4fdb1218b8dd961532ae07e4dbc34fedf6c24815759ac0e0a577819c",
+                  "image_uri": "900357929763.dkr.ecr.us-east-1.amazonaws.com/pge-ecr@sha256:42448f457502cd9f2d853a7a5332bcec0d8e9fc3da4b97483e428c7c45f6ed0e",
                   "invoke_arn": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:900357929763:function:pge-lambda-with-docker-build-from-ecr/invocations",
                   "kms_key_arn": "",
-                  "last_modified": "2025-02-04T06:56:54.000+0000",
+                  "last_modified": "2025-02-04T11:49:21.000+0000",
                   "layers": [],
                   "logging_config": [
                     {
@@ -9214,97 +9164,20 @@
   },
   "relevant_attributes": [
     {
-      "resource": "module.ecr.aws_ecrpublic_repository.this[0]",
-      "attribute": [
-        "repository_uri"
-      ]
-    },
-    {
-      "resource": "module.ecr.aws_ecrpublic_repository.this[0]",
-      "attribute": [
-        "id"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
-      "attribute": [
-        "qualified_arn"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
-      "attribute": [
-        "version"
-      ]
-    },
-    {
       "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_arn.log_group_arn[0]",
       "attribute": [
-        "service"
+        "partition"
       ]
     },
     {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_arn.log_group_arn[0]",
+      "resource": "module.lambda_function_with_docker_build_from_ecr.data.external.archive_prepare[0]",
       "attribute": [
-        "resource"
+        "result",
+        "was_missing"
       ]
     },
     {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_cloudwatch_log_group.lambda[0]",
-      "attribute": [
-        "arn"
-      ]
-    },
-    {
-      "resource": "module.docker_build_from_ecr.docker_image.this",
-      "attribute": [
-        "image_id"
-      ]
-    },
-    {
-      "resource": "module.ecr.aws_ecrpublic_repository.this[0]",
-      "attribute": [
-        "arn"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_caller_identity.current",
-      "attribute": [
-        "account_id"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
-      "attribute": [
-        "last_modified"
-      ]
-    },
-    {
-      "resource": "module.ecr.aws_ecr_repository.this[0]",
-      "attribute": [
-        "arn"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
-      "attribute": [
-        "kms_key_arn"
-      ]
-    },
-    {
-      "resource": "module.docker_build_from_ecr.docker_image.this",
-      "attribute": [
-        "name"
-      ]
-    },
-    {
-      "resource": "module.ecr.aws_ecr_repository.this[0]",
-      "attribute": [
-        "name"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_layer_version.this[0]",
       "attribute": [
         "source_code_size"
       ]
@@ -9316,46 +9189,9 @@
       ]
     },
     {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_iam_role.lambda[0]",
-      "attribute": [
-        "name"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
+      "resource": "module.ecr.aws_ecrpublic_repository.this[0]",
       "attribute": [
         "arn"
-      ]
-    },
-    {
-      "resource": "module.docker_build_from_ecr.data.aws_region.current",
-      "attribute": [
-        "name"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.external.archive_prepare[0]",
-      "attribute": [
-        "result",
-        "filename"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_cloudwatch_log_group.lambda[0]",
-      "attribute": [
-        "name"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_cloudwatch_log_group.lambda[0]",
-      "attribute": [
-        "arn"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_partition.current",
-      "attribute": [
-        "partition"
       ]
     },
     {
@@ -9371,15 +9207,190 @@
       ]
     },
     {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_arn.log_group_arn[0]",
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
       "attribute": [
-        "partition"
+        "source_code_hash"
       ]
     },
     {
-      "resource": "aws_s3_bucket.pge_data_bucket",
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_cloudwatch_log_group.lambda[0]",
       "attribute": [
-        "bucket"
+        "arn"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.data.external.archive_prepare[0]",
+      "attribute": [
+        "result",
+        "filename"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_caller_identity.current",
+      "attribute": [
+        "account_id"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
+      "attribute": [
+        "signing_profile_version_arn"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
+      "attribute": [
+        "kms_key_arn"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function_url.this[0]",
+      "attribute": [
+        "url_id"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_arn.log_group_arn[0]",
+      "attribute": [
+        "resource"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_cloudwatch_log_group.lambda[0]",
+      "attribute": [
+        "arn"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_arn.log_group_arn[0]",
+      "attribute": [
+        "account"
+      ]
+    },
+    {
+      "resource": "module.ecr.aws_ecrpublic_repository.this[0]",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "module.ecr.aws_ecrpublic_repository.this[0]",
+      "attribute": [
+        "registry_id"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_iam_role.lambda[0]",
+      "attribute": [
+        "arn"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_iam_role.lambda[0]",
+      "attribute": [
+        "unique_id"
+      ]
+    },
+    {
+      "resource": "module.docker_build_from_ecr.docker_registry_image.this",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
+      "attribute": [
+        "arn"
+      ]
+    },
+    {
+      "resource": "module.ecr.aws_ecr_repository.this[0]",
+      "attribute": [
+        "repository_url"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function_url.this[0]",
+      "attribute": [
+        "function_url"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_arn.log_group_arn[0]",
+      "attribute": [
+        "service"
+      ]
+    },
+    {
+      "resource": "module.docker_build_from_ecr.data.aws_region.current",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_layer_version.this[0]",
+      "attribute": [
+        "created_date"
+      ]
+    },
+    {
+      "resource": "module.ecr.aws_ecrpublic_repository.this[0]",
+      "attribute": [
+        "repository_uri"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_iam_role.lambda[0]",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
+      "attribute": [
+        "qualified_arn"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
+      "attribute": [
+        "last_modified"
+      ]
+    },
+    {
+      "resource": "module.docker_build_from_ecr.aws_ecr_repository.this[0]",
+      "attribute": [
+        "id"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_cloudwatch_log_group.lambda[0]",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_cloudwatch_log_group.lambda[0]",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_layer_version.this[0]",
+      "attribute": [
+        "layer_arn"
+      ]
+    },
+    {
+      "resource": "module.ecr.aws_ecr_repository.this[0]",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "module.ecr.aws_ecr_repository.this[0]",
+      "attribute": [
+        "arn"
       ]
     },
     {
@@ -9395,22 +9406,8 @@
       ]
     },
     {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_iam_role.lambda[0]",
-      "attribute": [
-        "arn"
-      ]
-    },
-    {
-      "resource": "module.ecr.aws_ecrpublic_repository.this[0]",
-      "attribute": [
-        "registry_id"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function_url.this[0]",
-      "attribute": [
-        "url_id"
-      ]
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_event_source_mapping.this",
+      "attribute": []
     },
     {
       "resource": "module.docker_build_from_ecr.data.aws_caller_identity.this",
@@ -9419,7 +9416,13 @@
       ]
     },
     {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_layer_version.this[0]",
+      "resource": "module.docker_build_from_ecr.docker_registry_image.this",
+      "attribute": [
+        "name"
+      ]
+    },
+    {
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
       "attribute": [
         "source_code_size"
       ]
@@ -9431,21 +9434,9 @@
       ]
     },
     {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_layer_version.this[0]",
+      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
       "attribute": [
-        "layer_arn"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_layer_version.this[0]",
-      "attribute": [
-        "created_date"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.aws_arn.log_group_arn[0]",
-      "attribute": [
-        "account"
+        "version"
       ]
     },
     {
@@ -9455,27 +9446,9 @@
       ]
     },
     {
-      "resource": "module.docker_build_from_ecr.docker_registry_image.this",
+      "resource": "module.docker_build_from_ecr.docker_image.this",
       "attribute": [
         "name"
-      ]
-    },
-    {
-      "resource": "module.docker_build_from_ecr.docker_registry_image.this",
-      "attribute": [
-        "id"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function_url.this[0]",
-      "attribute": [
-        "function_url"
-      ]
-    },
-    {
-      "resource": "module.docker_build_from_ecr.aws_ecr_repository.this[0]",
-      "attribute": [
-        "id"
       ]
     },
     {
@@ -9485,55 +9458,14 @@
       ]
     },
     {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_iam_role.lambda[0]",
-      "attribute": [
-        "unique_id"
-      ]
-    },
-    {
       "resource": "module.lambda_function_with_docker_build_from_ecr.aws_s3_object.lambda_package[0]",
       "attribute": [
         "version_id"
       ]
-    },
-    {
-      "resource": "module.ecr.aws_ecr_repository.this[0]",
-      "attribute": [
-        "repository_url"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
-      "attribute": [
-        "source_code_hash"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_event_source_mapping.this",
-      "attribute": []
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_lambda_function.this[0]",
-      "attribute": [
-        "signing_profile_version_arn"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.aws_cloudwatch_log_group.lambda[0]",
-      "attribute": [
-        "name"
-      ]
-    },
-    {
-      "resource": "module.lambda_function_with_docker_build_from_ecr.data.external.archive_prepare[0]",
-      "attribute": [
-        "result",
-        "was_missing"
-      ]
     }
   ],
-  "timestamp": "2025-02-04T11:31:48Z",
-  "applyable": true,
+  "timestamp": "2025-02-04T11:50:07Z",
+  "applyable": false,
   "complete": true,
   "errored": false
 }

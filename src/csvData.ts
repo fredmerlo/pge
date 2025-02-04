@@ -30,12 +30,12 @@ export class CsvData {
         Body: csv,
       }));
 
-      const url = await getSignedUrl(s3, new GetObjectCommand({
-        Bucket: FILE_OUTPUT,
-        Key: "data.csv",
-      }), { expiresIn: 300 });
+      // const url = await getSignedUrl(s3, new GetObjectCommand({
+      //   Bucket: FILE_OUTPUT,
+      //   Key: "data.csv",
+      // }), { expiresIn: 300 });
 
-      return url;
+      // return url;
     }
 
     return csv;
