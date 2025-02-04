@@ -33,7 +33,10 @@ jobs:
         run: npm install
      
       - name: Run Tests
-        run: npm run test
+        run: npm run test-ci
+        env:
+          JEST_JUNIT_OUTPUT_DIR: "reports"
+          JEST_JUNIT_OUTPUT_NAME: "report.xml"
   
       - name: Test Report
         uses: dorny/test-reporter@v1
