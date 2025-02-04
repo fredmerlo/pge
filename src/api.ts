@@ -5,6 +5,7 @@ import { Authorizer } from './authorizer';
 import { CsvData } from './csvData';
 const Log = require('@hapi/log/lib');
 
+const FILE_OUTPUT = process.env.FILE_OUTPUT || 'LOCAL';
 export class Api {
   public server: Hapi.Server;
   public httpClient: HttpClient;
@@ -42,6 +43,10 @@ export class Api {
             const data = await this.httpClient.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
             const processedData = await this.processor.process(data);
             const csv = await this.csvData.convert(processedData);
+
+            if (FILE_OUTPUT !== 'LOCAL') {
+              return h.redirect(csv).code(302);
+            }
   
             return h.response({ csv }).code(200);
           } catch (error) {

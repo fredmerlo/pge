@@ -1,7 +1,8 @@
 
 import { json2csv } from "json-2-csv";
 import { promises as fs } from "fs";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand  } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
 export class CsvData {
@@ -28,6 +29,13 @@ export class CsvData {
         Key: "data.csv",
         Body: csv,
       }));
+
+      const url = await getSignedUrl(s3, new GetObjectCommand({
+        Bucket: FILE_OUTPUT,
+        Key: "data.csv",
+      }), { expiresIn: 300 });
+
+      return url;
     }
 
     return csv;
