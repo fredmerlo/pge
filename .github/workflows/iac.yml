@@ -19,7 +19,7 @@ jobs:
 
     permissions:
       id-token: write
-      contents: read
+      contents: write
       security-events: write
       actions: read
 
