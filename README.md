@@ -154,6 +154,19 @@ Invoking the APIGateway Rest API follows the same workflow used for the local La
    aws s3 ls pge-data-bucket
    2025-02-03 12:33:56        494 data.csv
    ```
+#### AWS API Endpoints
+
+|**JWT Token Request**|                                                   |
+|---------------------|---------------------------------------------------|
+|Endpoint|https://iaoe8o5c0e.execute-api.us-east-1.amazonaws.com/pge/token|
+|HTTP Method|POST|
+|Authorization|Basic user:secret|
+|JSON Response|{"token":"JWT Token Value"}|
+|**Stations CSV Data Request**||
+|Endpoint|https://iaoe8o5c0e.execute-api.us-east-1.amazonaws.com/pge/data|
+|HTTP Method|GET|
+|Authorization|Bearer JWT Token Value|
+|JSON Response|{"csv":"Station Data CSV Value"}|
 
 #### Project Layout
 ```
