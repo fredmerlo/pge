@@ -32,7 +32,7 @@ jobs:
         run: npm install
      
       - name: Run Tests
-        run: jest --json --outputFile=result.json --testLocationInResults
+        run: npx jest --json --outputFile=result.json --testLocationInResults
   
       - name: Report Test Results
         uses: tanmen/jest-reporter@v1

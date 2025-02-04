@@ -48,20 +48,28 @@ jobs:
       - name: Plan Terraform
         working-directory: ./tf
         run: |
-          terraform plan -var="aws_account_id=${{ secrets.AWS_ACCOUNT }}" -out="tfplan.bin"
-          terraform show -json "tfplan.bin" | jq  > "tfplan.json"
+          terraform plan -out="tfplan.bin"
+          terraform show -json "tfplan.bin" | jq  > ".github/tfplan.json"
     
       - name: Run Checkov
         id: checkov
-        working-directory: ./tf
         run: |
-          checkov -f tfplan.json -o cli -o sarif --repo-root-for-plan-enrichment ./tf \
+          checkov -f .github/tfplan.json -o cli -o sarif --repo-root-for-plan-enrichment ./tf \
           --output-file-path console,results.sarif --config-file .github/checkov.yml \
-          --download-external-modules true --enable-secret-scan-all-files 
+          --download-external-modules true --enable-secret-scan-all-files
         
       - name: Upload SARIF file
         id: sarif
         uses: github/codeql-action/upload-sarif@v3
         if: success() || failure()
         with:
-          sarif_file: ./tf/results.sarif
+          sarif_file: results.sarif
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        name: Commit Terraform Plan
+        with:
+          commit_message: "Terraform Plan"
+          file_pattern: ".github/tfplan.*"
+          commit_user_name: fredmerlo
+          commit_user_email: fredmerlo@gmail.com
+          commit_author: fredmerlo <fredmerlo@gmail.com>
