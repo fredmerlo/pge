@@ -160,7 +160,7 @@ Invoking the APIGateway Rest API follows the same workflow used for the local La
 |---------------------|---------------------------------------------------|
 |Endpoint|https://iaoe8o5c0e.execute-api.us-east-1.amazonaws.com/pge/token|
 |HTTP Method|POST|
-|Authorization|Basic user:secret|
+|Authorization|Basic test:supersecret|
 |JSON Response|{"token":"JWT_Token_Value"}|
 |**Stations CSV Data Request**||
 |Endpoint|https://iaoe8o5c0e.execute-api.us-east-1.amazonaws.com/pge/data|
