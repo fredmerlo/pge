@@ -99,7 +99,6 @@ From the local repository root directory:
    + **pge:test** is the tag that will be assigned to the running container, this can be any value.
     Now that we have the image running, we can invoke the API.
 
-   The invocaiton pattern varies between local Lambda and APIGW/ECR.  
 3. The solution uses JWT for API Authorization, so we need to get a token
    ```
    curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"httpMethod":"POST","path":"/token","headers":{"Authorization":"Basic dGVzdDpzdXBlcnNlY3JldA=="}}'
@@ -109,6 +108,7 @@ From the local repository root directory:
     + The Lambda uri is quite different from what we normally see in a Rest API, APIGW Proxy Integration abstracts quite a bit for us.
     + **-d** APIGW Proxy Integration invokes the Lambda only via POST, notice the uri does not have a resource path, because the posted APIGatewayEvent payload is what the Lambda uses.
     + **Basic dGVzdDpzdXBlcnNlY3JldA==** is the Base64 encoded value for *user:secret*
+  
    The response will be:
    ```
    {"statusCode":200,"headers":{"content-type":"application/json; charset=utf-8","cache-control":"no-cache","content-length":260,"date":"Mon, 03 Feb 2025 17:13:48 GMT","connection":"keep-alive"},"body":"{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMwMDgsImlhdCI6MTczODYwMjgyOH0.ac38kE_0Ct-evDzM2WLfpcXctOAIokDqWAS17fdkRwk\"}"}
