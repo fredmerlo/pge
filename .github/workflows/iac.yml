@@ -49,7 +49,7 @@ jobs:
         working-directory: ./tf
         run: |
           terraform plan -out="tfplan.bin"
-          terraform show -json "tfplan.bin" | jq  > ".github/tfplan.json"
+          terraform show -json "tfplan.bin" | jq  > "../.github/tfplan.json"
     
       - name: Run Checkov
         id: checkov
