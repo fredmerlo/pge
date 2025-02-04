@@ -3,7 +3,8 @@ name: Checkov IaC Scan
 on:
   push:
     branches:
-      - main
+      - fix**
+      - feat**
     paths-ignore:
       - '.github/**'
       - '*.md'
