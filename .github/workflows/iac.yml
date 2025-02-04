@@ -27,11 +27,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Get pip cache dir
+        id: pip-cache
+        shell: bash
+        run: |
+          echo "dir=$(pip3 cache dir)" >> $GITHUB_OUTPUT
+
       - name: Cache Checkov
         id: cache-checkov
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
+          path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
