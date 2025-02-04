@@ -27,21 +27,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get pip cache dir
-        id: pip-cache
-        shell: bash
+      - name: Install Checkov
         run: |
-          echo "dir=$(pip3 cache dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Checkov
-        id: cache-checkov
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-            ${{ runner.os }}-pip-
+          pip3 install checkov
 
       - name: Configure AWS credentials
         id: aws-credentials
@@ -50,23 +38,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install Checkov
-        run: |
-          pip3 install checkov
-
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
-    
-      - name: Cache Terraform
-        id: cache-terraform
-        uses: actions/cache@v4
-        with:
-          path: ./tf/.terraform
-          key: ${{ runner.os }}-tf-${{ hashFiles('./tf/.terraform.lock.hcl') }}
-          restore-keys: |
-            ${{ runner.os }}-tf-${{ hashFiles('./tf/.terraform.lock.hcl') }}
-            ${{ runner.os }}-tf-
-
+        
       - name: Initialize Terraform
         working-directory: ./tf
         run: terraform init -ignore-remote-version
