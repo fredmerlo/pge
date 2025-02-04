@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PGE_PAT }}
 
       - name: Install Checkov
         run: |
@@ -65,12 +67,10 @@ jobs:
         with:
           sarif_file: results.sarif
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        name: Commit Terraform Plan
+      - name: Commit Terraform plan
+        id: commit 
+        uses: stefanzweifel/git-auto-commit-action@v5
         if: success() || failure()
         with:
-          commit_message: "Terraform Plan"
+          commit_message: "IaC Template [no ci]"
           file_pattern: ".github/tfplan.*"
-          commit_user_name: fredmerlo
-          commit_user_email: fredmerlo@gmail.com
-          commit_author: fredmerlo <fredmerlo@gmail.com>
