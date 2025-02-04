@@ -44,9 +44,9 @@ export class Api {
             const processedData = await this.processor.process(data);
             const csv = await this.csvData.convert(processedData);
 
-            // if (FILE_OUTPUT !== 'LOCAL') {
-            //   return h.redirect(csv).code(302);
-            // }
+            if (FILE_OUTPUT !== 'LOCAL') {
+              return h.redirect(csv).code(302);
+            }
   
             return h.response({ csv }).code(200);
           } catch (error) {
