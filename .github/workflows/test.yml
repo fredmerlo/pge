@@ -1,0 +1,42 @@
+name: Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+      - '*.md'
+      - '.gitignore'
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      checks: write
+  
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+        
+      - name: Install Dependencies
+        run: npm install
+     
+      - name: Run Tests
+        run: jest --json --outputFile=result.json --testLocationInResults
+  
+      - name: Report Test Results
+        uses: tanmen/jest-reporter@v1
+        if: always()
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+    
