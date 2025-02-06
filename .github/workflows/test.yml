@@ -3,7 +3,8 @@ name: Unit Tests
 on:
   push:
     branches:
-      - main
+      - feat**
+      - fix**
     paths-ignore:
       - '.github/**'
       - '*.md'
@@ -32,7 +33,10 @@ jobs:
         run: npm install
      
       - name: Run Tests
-        run: npm run test
+        run: npm run test-ci
+        env:
+          JEST_JUNIT_OUTPUT_DIR: "reports"
+          JEST_JUNIT_OUTPUT_NAME: "report.xml"
   
       - name: Test Report
         uses: dorny/test-reporter@v1
@@ -41,4 +45,3 @@ jobs:
           name: JEST Tests    
           path: reports/report.xml
           reporter: jest-junit  
-    
