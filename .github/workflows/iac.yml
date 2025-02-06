@@ -58,7 +58,7 @@ jobs:
         run: |
           checkov -d ./tf -o cli -o sarif \
           --output-file-path console,results.sarif --config-file .github/checkov.yml \
-          --download-external-modules true --enable-secret-scan-all-files
+          --enable-secret-scan-all-files
         
       - name: Upload SARIF file
         id: sarif
