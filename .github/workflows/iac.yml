@@ -56,7 +56,7 @@ jobs:
       - name: Run Checkov
         id: checkov
         run: |
-          checkov -f .github/tfplan.json -o cli -o sarif --repo-root-for-plan-enrichment ./tf \
+          checkov -d ./tf -o cli -o sarif \
           --output-file-path console,results.sarif --config-file .github/checkov.yml \
           --download-external-modules true --enable-secret-scan-all-files
         
