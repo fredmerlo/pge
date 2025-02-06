@@ -116,7 +116,7 @@ From the local repository root directory:
    There's our JWT token.
 4. Now we copy the token invoke the station data API
    ```
-   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"path":"/","headers":{"Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMyODEsImlhdCI6MTczODYwMzEwMX0.wqURjtjzXLK4sQkNN78zQb_ivuH178HP6xn9tquBhYQ"}}'
+   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"path":"/data","headers":{"Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMyODEsImlhdCI6MTczODYwMzEwMX0.wqURjtjzXLK4sQkNN78zQb_ivuH178HP6xn9tquBhYQ"}}'
    ```
    And the response:
    ```
