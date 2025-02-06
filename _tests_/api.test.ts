@@ -64,7 +64,8 @@ describe('Api', () => {
     const getRoute = await server.inject({ method: 'GET', url: '/data', headers: { authorization: 'Bearer ' + ( postRoute.result as any ).token } });
 
     expect(getRoute.statusCode).toBe(200);
-    expect(httpClient.get).toHaveBeenCalledWith('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
+    // expect(httpClient.get).toHaveBeenCalledWith('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
+    expect(httpClient.get).toHaveBeenCalledWith('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
     expect(processor.process).toHaveBeenCalled();
     expect(csvData.convert).toHaveBeenCalled();
   });
@@ -76,6 +77,7 @@ describe('Api', () => {
     const getRoute = await server.inject({ method: 'GET', url: '/data', headers: { authorization: 'Bearer ' + ( postRoute.result as any ).token } });
 
     expect(getRoute.statusCode).toBe(500);
-    expect(httpClient.get).toHaveBeenCalledWith('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
+    // expect(httpClient.get).toHaveBeenCalledWith('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
+    expect(httpClient.get).toHaveBeenCalledWith('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
   });
 });
