@@ -39,7 +39,8 @@ export class Api {
         },
         handler: async (request, h) => {
           try {
-            const data = await this.httpClient.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
+            // const data = await this.httpClient.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
+            const data = await this.httpClient.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
             const processedData = await this.processor.process(data);
             const csv = await this.csvData.convert(processedData);
   
