@@ -5,7 +5,8 @@
   "scripts": {
     "buildLambda": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
     "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
-    "test": "jest"
+    "test": "jest",
+    "test-ci": "jest --ci --reporters=jest-junit"
   },
   "author": "",
   "license": "ISC",
