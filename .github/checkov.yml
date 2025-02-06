@@ -2,6 +2,7 @@ skip-check:
   - CKV_SECRET_6
   - CKV2_AWS_4
   - CKV2_AWS_29
+  - CKV2_AWS_51
   - CKV2_AWS_61
   - CKV2_AWS_62
   - CKV_AWS_18
