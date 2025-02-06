@@ -89,14 +89,14 @@ From the local repository root directory:
 
 2. After the build completes we can now run the image
    ```
-   docker run --mount type=bind,src=/Users/fredmerlo/development/pge/data,dst=/processed --platform linux/amd64 -p 9000:8080 pge:test  
+   docker run --mount type=bind,src=/Users/fredmerlo/development/pge/data,dst=/processed --platform linux/amd64 -p 9000:8080 pge  
    ```
    Let's break-down each argument:
 
    + **--mount** since this is an AWS Lambda image there really is no *local* file storage per-se; to clarify, once an image has been published in ECR it is immutable. This argument binds a local directory to the image mount point **dst=/processed** this mount value is necessary for local csv file delivery and should not be modified. The **src=/some-full/host-directory** can be any path on the local system, it must be a complete path, docker mounts do not support relatve paths.
    + **--platform linux/amd64** this is the base platform for the base AWS ECR Image, this value should not be changed either.
    + **-p 9000:8080** is the port forwarding argument for the running image, though I haven't gone through the AWS ECR Image source, I suspect the container may have a hard dependency on port **8080**
-   + **pge:test** is the tag that will be assigned to the running container, this can be any value.
+   + **pge** is the tag assigned to the image during build.
     Now that we have the image running, we can invoke the API.
 
 3. The solution uses JWT for API Authorization, so we need to get a token
