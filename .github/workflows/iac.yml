@@ -1,9 +1,10 @@
 name: Checkov IaC Scan
 
-on:
+on:  
   push:
     branches:
-      - main
+      - fix**
+      - feat**
     paths-ignore:
       - '.github/**'
       - '*.md'
@@ -25,6 +26,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PGE_PAT }}
 
       - name: Install Checkov
         run: |
@@ -37,18 +40,18 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+      # - name: Set up Terraform
+      #   uses: hashicorp/setup-terraform@v3
         
-      - name: Initialize Terraform
-        working-directory: ./tf
-        run: terraform init -ignore-remote-version
+      # - name: Initialize Terraform
+      #   working-directory: ./tf
+      #   run: terraform init -ignore-remote-version
         
-      - name: Plan Terraform
-        working-directory: ./tf
-        run: |
-          terraform plan -refresh=false -out="tfplan.bin"
-          terraform show -json "tfplan.bin" | jq  > "../.github/tfplan.json"
+      # - name: Plan Terraform
+      #   working-directory: ./tf
+      #   run: |
+      #     terraform plan -refresh=false -out="tfplan.bin"
+      #     terraform show -json "tfplan.bin" | jq  > "../.github/tfplan.json"
     
       - name: Run Checkov
         id: checkov
@@ -64,12 +67,10 @@ jobs:
         with:
           sarif_file: results.sarif
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        name: Commit Terraform Plan
-        if: success() || failure()
-        with:
-          commit_message: "Terraform Plan"
-          file_pattern: ".github/tfplan.*"
-          commit_user_name: fredmerlo
-          commit_user_email: fredmerlo@gmail.com
-          commit_author: fredmerlo <fredmerlo@gmail.com>
+      # - name: Commit Terraform plan
+      #   id: commit 
+      #   uses: stefanzweifel/git-auto-commit-action@v5
+      #   if: success() || failure()
+      #   with:
+      #     commit_message: "IaC Template [no ci]"
+      #     file_pattern: ".github/tfplan.*"
