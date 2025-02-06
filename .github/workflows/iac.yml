@@ -1,12 +1,20 @@
 name: Checkov IaC Scan
 
-on:  
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+    paths-ignore:
+      - '.github/workflows/**'
+      - '*.md'
+      - '.gitignore'
   push:
     branches:
       - fix**
       - feat**
     paths-ignore:
-      - '.github/**'
+      - '.github/workflows/**'
       - '*.md'
       - '.gitignore'
 
@@ -26,32 +34,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        # with:
-        #   token: ${{ secrets.PGE_PAT }}
 
       - name: Install Checkov
         run: |
           pip3 install checkov
-
-      # - name: Configure AWS credentials
-      #   id: aws-credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     role-to-assume: ${{ secrets.AWS_ROLE }}
-      #     aws-region: ${{ secrets.AWS_REGION }}
-
-      # - name: Set up Terraform
-      #   uses: hashicorp/setup-terraform@v3
-        
-      # - name: Initialize Terraform
-      #   working-directory: ./tf
-      #   run: terraform init -ignore-remote-version
-        
-      # - name: Plan Terraform
-      #   working-directory: ./tf
-      #   run: |
-      #     terraform plan -refresh=false -out="tfplan.bin"
-      #     terraform show -json "tfplan.bin" | jq  > "../.github/tfplan.json"
     
       - name: Run Checkov
         id: checkov
@@ -66,11 +52,3 @@ jobs:
         if: success() || failure()
         with:
           sarif_file: results.sarif
-
-      # - name: Commit Terraform plan
-      #   id: commit 
-      #   uses: stefanzweifel/git-auto-commit-action@v5
-      #   if: success() || failure()
-      #   with:
-      #     commit_message: "IaC Template [no ci]"
-      #     file_pattern: ".github/tfplan.*"
