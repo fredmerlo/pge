@@ -3,10 +3,9 @@ import { json2csv } from "json-2-csv";
 import { promises as fs } from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
 export class CsvData {
   async convert(data: any) {
-
+    const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
     const csv = await new Promise<string>((resolve, reject) => {
       try {
         resolve(json2csv(data));
