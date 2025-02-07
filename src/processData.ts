@@ -37,6 +37,7 @@ export interface IData {
 }
 
 const MAX_CAPACITY = 12;
+const SHARD_SIZE = 500;
 
 export class ProcessData {
   async process(data: string): Promise<IRenamedStation[]> {
@@ -50,24 +51,30 @@ export class ProcessData {
     const stations = parsed.data.stations
     console.log(`Processing ${stations.length} stations`);
 
+    const wholeShards = Math.trunc(stations.length / SHARD_SIZE);
+    const partialShard = stations.length % SHARD_SIZE;
+    const shardIndexes = Array.from({ length: wholeShards + (partialShard > 0 ? 1 : 0) }, (_, i) => i * SHARD_SIZE);
+
     const stationsList = await Promise.all(
-      stations.map(async (station: IStation) => {
-        if (station.capacity < MAX_CAPACITY) {
-          console.log(`Processing station ${station.station_id} with capacity ${station.capacity}`);
-          const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = station;
-          const renamedStation: IRenamedStation = {
-            ...rest,
-            externalId: external_id,
-            stationId: station_id,
-            legacyId: legacy_id
-          };
-          return renamedStation;
-        }
-        return null;
+      shardIndexes.map(async (startIndex: number) => {
+        const shard = stations.slice(startIndex, startIndex + SHARD_SIZE);
+        const processedShard = shard.map((station: IStation) => {
+          if (station.capacity < MAX_CAPACITY) {
+            const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = station;
+            const renamedStation: IRenamedStation = {
+              ...rest,
+              externalId: external_id,
+              stationId: station_id,
+              legacyId: legacy_id
+            };
+            return renamedStation;
+          }
+          return null;
+        });
+        return processedShard;
       })
     );
-
-    const filteredStations = stationsList.filter(station => station !== null);
+    const filteredStations = stationsList.flatMap((station) => station).filter((station) => station !== null);
     console.log(`Returning ${filteredStations.length} stations`);
     return filteredStations;
   }
