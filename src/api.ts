@@ -3,10 +3,11 @@ import { HttpClient } from './httpClient';
 import { ProcessData } from './processData';
 import { Authorizer } from './authorizer';
 import { CsvData } from './csvData';
-const Log = require('@hapi/log/lib');
+import { CommonPlugins } from './commonplugins';
 
 export interface IApiState extends Hapi.ServerApplicationState {
   isInitialized: boolean;
+  lastEtag?: string;
 }
 
 export class Api {
@@ -15,6 +16,7 @@ export class Api {
   public processor: ProcessData;
   public authorizer: Authorizer;
   public csvData: CsvData;
+  public commonPlugins: CommonPlugins;
 
   constructor() {
 
@@ -31,8 +33,7 @@ export class Api {
       this.processor = new ProcessData();
       this.authorizer = new Authorizer();
       this.csvData = new CsvData();
-
-      this.server.register({ plugin: Log });
+      this.commonPlugins = new CommonPlugins();
 
       this.authorizer.BasicAuthorizer(this.server);
       this.authorizer.JwtAuthorizer(this.server);
@@ -43,6 +44,7 @@ export class Api {
 
   async init() {
     if (!(this.server.app as IApiState).isInitialized) {
+      await this.commonPlugins.register(this.server);
       this.server.route([
         {
           method: 'GET',
@@ -51,13 +53,35 @@ export class Api {
             auth: 'jwt',
           },
           handler: async (request, h) => {
+            const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
+            let csv = '';
             try {
               // const data = await this.httpClient.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
-              const data = await this.httpClient.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
-              const processedData = await this.processor.process(data);
-              const csv = await this.csvData.convert(processedData);
-    
-              return h.response({ csv }).code(200);
+              const { lastModified, etag } = await this.httpClient.head('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
+              if (!etag || (this.server.app as IApiState).lastEtag !== etag) {
+                const data = await this.httpClient.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
+                const processedData = await this.processor.process(data);
+                csv = await this.csvData.convert(processedData);
+
+                await new Promise((resolve) => {
+                  (this.server.app as IApiState).lastEtag = etag;
+                  resolve(true);
+                });
+              }
+
+              if (FILE_OUTPUT !== "LOCAL") {
+                const url = await this.csvData.s3Url();
+                return h.redirect(url).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(302);
+              }
+
+              if (h.file) {
+                return h.file('/tmp/data.csv', {
+                  confine: false,
+                  mode: 'inline'
+                }).encoding('utf8').type('text/csv').code(200);
+              }
+
+              return h.response(csv).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(200);
             } catch (error) {
               console.log(error);
               return h.response({ error: 'An error occurred' }).code(500);
@@ -72,6 +96,18 @@ export class Api {
           },
           handler: async (request, h) => {
             return { token: request.auth.credentials.token };
+          },
+        },
+        {
+          method: 'GET',
+          path: '/csv',
+          options: {
+            auth: 'jwt',
+          },
+          handler: async (request, h) => {
+            file: '/tmp/data.csv';
+
+            return h.file('/tmp/data.csv');
           },
         },
       ]);
