@@ -37,38 +37,78 @@ export interface IData {
 }
 
 const MAX_CAPACITY = 12;
+const SHARD_SIZE = 500;
 
 export class ProcessData {
   async process(data: string): Promise<IRenamedStation[]> {
-    const parsed = await new Promise<any>((resolve, reject) => {
+    return new Promise<IRenamedStation[]>((resolve, reject) => {
       try {
-        resolve(JSON.parse(data));
+        const parsed = JSON.parse(data)
+        const stations = parsed.data.stations
+        console.log(`Processing ${stations.length} stations`);
+
+        const wholeShards = Math.trunc(stations.length / SHARD_SIZE);
+        const partialShard = stations.length % SHARD_SIZE;
+        const shardIndexes = Array.from({ length: wholeShards + (partialShard > 0 ? 1 : 0) }, (_, i) => i * SHARD_SIZE);
+
+        resolve(shardIndexes.map((startIndex: number) => {
+          const shard = stations.slice(startIndex, startIndex + SHARD_SIZE);
+          const processedShard: IRenamedStation[] = shard.map((station: IStation) => {
+            if (station.capacity < MAX_CAPACITY) {
+              const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = station;
+              const renamedStation: IRenamedStation = {
+                ...rest,
+                externalId: external_id,
+                stationId: station_id,
+                legacyId: legacy_id
+              };
+              return renamedStation;
+            }
+            return null;
+          });
+          return processedShard.filter((station) => station !== null);
+        }).flatMap((station) => station));
       } catch (error) {
         reject(error);
       }
     });
-    const stations = parsed.data.stations
-    console.log(`Processing ${stations.length} stations`);
-
-    const stationsList = await Promise.all(
-      stations.map(async (station: IStation) => {
-        if (station.capacity < MAX_CAPACITY) {
-          console.log(`Processing station ${station.station_id} with capacity ${station.capacity}`);
-          const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = station;
-          const renamedStation: IRenamedStation = {
-            ...rest,
-            externalId: external_id,
-            stationId: station_id,
-            legacyId: legacy_id
-          };
-          return renamedStation;
-        }
-        return null;
-      })
-    );
-
-    const filteredStations = stationsList.filter(station => station !== null);
-    console.log(`Returning ${filteredStations.length} stations`);
-    return filteredStations;
   }
+  // async process(data: string): Promise<IRenamedStation[]> {
+  //   const parsed = await new Promise<any>((resolve, reject) => {
+  //     try {
+  //       resolve(JSON.parse(data));
+  //     } catch (error) {
+  //       reject(error);
+  //     }
+  //   });
+  //   const stations = parsed.data.stations
+  //   console.log(`Processing ${stations.length} stations`);
+
+  //   const wholeShards = Math.trunc(stations.length / SHARD_SIZE);
+  //   const partialShard = stations.length % SHARD_SIZE;
+  //   const shardIndexes = Array.from({ length: wholeShards + (partialShard > 0 ? 1 : 0) }, (_, i) => i * SHARD_SIZE);
+
+  //   const stationsList = new Promise<IRenamedStation[]>((resolve) => 
+  //     resolve(shardIndexes.map((startIndex: number) => {
+  //       const shard = stations.slice(startIndex, startIndex + SHARD_SIZE);
+  //       const processedShard: IRenamedStation[] = shard.map((station: IStation) => {
+  //         if (station.capacity < MAX_CAPACITY) {
+  //           const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = station;
+  //           const renamedStation: IRenamedStation = {
+  //             ...rest,
+  //             externalId: external_id,
+  //             stationId: station_id,
+  //             legacyId: legacy_id
+  //           };
+  //           return renamedStation;
+  //         }
+  //         return null;
+  //       });
+  //       return processedShard.filter((station) => station !== null);
+  //     }).flatMap((station) => station))
+  //   ).catch((error) => Promise.reject(error));
+  //   // const filteredStations = stationsList.flatMap((station) => station);
+  //   // console.log(`Returning ${filteredStations.length} stations`);
+  //   return stationsList;
+  // }
 } 
