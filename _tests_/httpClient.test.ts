@@ -16,12 +16,18 @@ describe('HttpClient', () => {
       res: {},
       payload: mockPayload
     });
+    (wreck.request as jest.Mock).mockResolvedValue({
+      headersDistinct: {
+        'last-modified': 'last-modified',
+        etag: 'etag'
+      }
+    });
 
     const url = 'https://example.com/data';
     const result = await httpClient.get(url);
 
     expect(wreck.get).toHaveBeenCalledWith(url);
-    expect(result).toBe(mockPayload);
+    expect(result).toEqual(mockPayload);
   });
 
   it('should log the correct messages', async () => {
@@ -29,6 +35,12 @@ describe('HttpClient', () => {
     (wreck.get as jest.Mock).mockResolvedValue({
       res: {},
       payload: mockPayload
+    });
+    (wreck.request as jest.Mock).mockResolvedValue({
+      headersDistinct: {
+        'last-modified': 'last-modified',
+        etag: 'etag'
+      }
     });
 
     const url = 'https://example.com/data';
@@ -38,5 +50,25 @@ describe('HttpClient', () => {
 
     expect(console.log).toHaveBeenCalledWith(`Fetching data from ${url}`);
     expect(console.log).toHaveBeenCalledWith(`Received data ${mockPayload.length} bytes from ${url}`);
+  });
+  it('should fetch data from the local cache', async () => {
+    const mockPayload = 'mock data';
+    (wreck.get as jest.Mock).mockResolvedValue({
+      res: {},
+      payload: mockPayload
+    });
+    (wreck.request as jest.Mock).mockResolvedValue({
+      headersDistinct: {
+        'last-modified': undefined,
+        etag: undefined
+      }
+    });
+
+    const url = 'https://example.com/data';
+    console.log = jest.fn();
+
+    await httpClient.get(url);
+
+    expect(console.log).toHaveBeenCalledWith(`Data not modified`);
   });
 });
