@@ -54,13 +54,14 @@ export class Api {
             auth: 'jwt',
           },
           handler: async (request, h) => {
+            let csv = '';
             try {
               // const data = await this.httpClient.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
               const { lastModified, etag } = await this.httpClient.head('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
               if (!etag || (this.server.app as IApiState).lastEtag !== etag) {
                 const data = await this.httpClient.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
                 const processedData = await this.processor.process(data);
-                await this.csvData.convert(processedData);
+                csv = await this.csvData.convert(processedData);
 
                 await new Promise((resolve) => {
                   (this.server.app as IApiState).lastEtag = etag;
@@ -68,10 +69,14 @@ export class Api {
                 });
               }
 
-              return h.file('/tmp/data.csv', {
-                confine: false,
-                mode: 'inline'
-              }).encoding('utf8').type('text/csv').code(200);
+              if (h.file) {
+                return h.file('/tmp/data.csv', {
+                  confine: false,
+                  mode: 'inline'
+                }).encoding('utf8').type('text/csv').code(200);
+              }
+              
+              return h.response(csv).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(200);
             } catch (error) {
               console.log(error);
               return h.response({ error: 'An error occurred' }).code(500);
