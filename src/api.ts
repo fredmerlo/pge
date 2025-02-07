@@ -3,10 +3,12 @@ import { HttpClient } from './httpClient';
 import { ProcessData } from './processData';
 import { Authorizer } from './authorizer';
 import { CsvData } from './csvData';
+import { resolve } from 'path';
 const Log = require('@hapi/log/lib');
 
 export interface IApiState extends Hapi.ServerApplicationState {
   isInitialized: boolean;
+  lastEtag?: string;
 }
 
 export class Api {
@@ -53,10 +55,21 @@ export class Api {
           handler: async (request, h) => {
             try {
               // const data = await this.httpClient.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
+              const { lastModified, etag } = await this.httpClient.head('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
+              if (etag && (this.server.app as IApiState).lastEtag === etag) {
+                const cachedCsv = await this.csvData.getFile();
+                return h.response({ cachedCsv }).code(200);
+              }
+
+              await new Promise((resolve) => {
+                (this.server.app as IApiState).lastEtag = etag;
+                resolve(true);
+              });
+
               const data = await this.httpClient.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
               const processedData = await this.processor.process(data);
               const csv = await this.csvData.convert(processedData);
-    
+
               return h.response({ csv }).code(200);
             } catch (error) {
               console.log(error);

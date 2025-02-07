@@ -1,5 +1,5 @@
 import * as Hapi from '@hapi/hapi';
-import { Api } from '../src/api';
+import { Api, IApiState } from '../src/api';
 import { HttpClient } from '../src/httpClient';
 import { ProcessData } from '../src/processData';
 import { CsvData } from '../src/csvData';
@@ -60,6 +60,8 @@ describe('Api', () => {
   });
   it('should handle GET /data authenticated', async () => {
     await api.init();
+    (httpClient.head as jest.Mock).mockResolvedValue({ lastModified: undefined, etag: undefined });
+
     const postRoute = await server.inject({ method: 'POST', url: '/token', headers: { authorization: 'Basic ' + (Buffer.from('test:supersecret', 'utf8')).toString('base64') } });
     const getRoute = await server.inject({ method: 'GET', url: '/data', headers: { authorization: 'Bearer ' + ( postRoute.result as any ).token } });
 
@@ -73,6 +75,8 @@ describe('Api', () => {
     api.processor.process = jest.fn().mockRejectedValue(new Error('mockError'));
     
     await api.init();
+    (httpClient.head as jest.Mock).mockResolvedValue({ lastModified: undefined, etag: undefined });
+
     const postRoute = await server.inject({ method: 'POST', url: '/token', headers: { authorization: 'Basic ' + (Buffer.from('test:supersecret', 'utf8')).toString('base64') } });
     const getRoute = await server.inject({ method: 'GET', url: '/data', headers: { authorization: 'Bearer ' + ( postRoute.result as any ).token } });
 

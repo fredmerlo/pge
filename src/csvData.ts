@@ -17,6 +17,7 @@ export class CsvData {
     console.log(`CSV bytes: ${csv.length}`);
 
     if (FILE_OUTPUT === "LOCAL") {
+      await fs.writeFile("/tmp/data.csv", csv);
       await fs.writeFile("/processed/data.csv", csv);
     } else {
       const s3 = new S3Client();
@@ -29,6 +30,11 @@ export class CsvData {
       }));
     }
 
+    return csv;
+  }
+
+  async getFile() {
+    const csv = await fs.readFile("/tmp/data.csv", "utf8");
     return csv;
   }
 }

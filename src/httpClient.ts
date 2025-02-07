@@ -15,13 +15,7 @@ export class HttpClient {
 
   async get(url: string) {
 
-    const head = await wreck.request('head', url);
-    const headers = head.headersDistinct;
-    const lastModified = headers['last-modified'] ? (headers['last-modified'])[0] : undefined;
-    const etag = headers.etag ? headers.etag[0] : undefined;
-
-    console.log(`Last-Modified: ${lastModified}`);
-    console.log(`ETag: ${etag}`);
+    const { lastModified, etag } = await this.head(url);
 
     if(lastModified !== this.localData.lastModified || etag !== this.localData.etag) {
       console.log(`Fetching data from ${url}`);
@@ -37,5 +31,17 @@ export class HttpClient {
 
     console.log('Data not modified');
     return this.localData.data;
+  }
+
+  async head(url: string) {
+    const head = await wreck.request('head', url);
+    const headers = head.headersDistinct;
+    const lastModified = headers['last-modified'] ? (headers['last-modified'])[0] : undefined;
+    const etag = headers.etag ? headers.etag[0] : undefined;
+
+    console.log(`Last-Modified: ${lastModified}`);
+    console.log(`ETag: ${etag}`);
+
+    return { lastModified, etag };
   }
 }
