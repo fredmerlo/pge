@@ -1,10 +1,9 @@
 import * as Hapi from '@hapi/hapi';
-import * as Inert from '@hapi/inert';
 import { HttpClient } from './httpClient';
 import { ProcessData } from './processData';
 import { Authorizer } from './authorizer';
 import { CsvData } from './csvData';
-const Log = require('@hapi/log/lib');
+import { CommonPlugins } from './commonplugins';
 
 export interface IApiState extends Hapi.ServerApplicationState {
   isInitialized: boolean;
@@ -17,6 +16,7 @@ export class Api {
   public processor: ProcessData;
   public authorizer: Authorizer;
   public csvData: CsvData;
+  public commonPlugins: CommonPlugins;
 
   constructor() {
 
@@ -33,9 +33,7 @@ export class Api {
       this.processor = new ProcessData();
       this.authorizer = new Authorizer();
       this.csvData = new CsvData();
-
-      this.server.register({ plugin: Log });
-      this.server.register(Inert);
+      this.commonPlugins = new CommonPlugins();
 
       this.authorizer.BasicAuthorizer(this.server);
       this.authorizer.JwtAuthorizer(this.server);
@@ -46,6 +44,7 @@ export class Api {
 
   async init() {
     if (!(this.server.app as IApiState).isInitialized) {
+      await this.commonPlugins.register(this.server);
       this.server.route([
         {
           method: 'GET',
@@ -54,6 +53,7 @@ export class Api {
             auth: 'jwt',
           },
           handler: async (request, h) => {
+            const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
             let csv = '';
             try {
               // const data = await this.httpClient.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
@@ -69,13 +69,17 @@ export class Api {
                 });
               }
 
+              if (FILE_OUTPUT !== "LOCAL") {
+                return h.redirect(csv).code(302);
+              }
+
               if (h.file) {
                 return h.file('/tmp/data.csv', {
                   confine: false,
                   mode: 'inline'
                 }).encoding('utf8').type('text/csv').code(200);
               }
-              
+
               return h.response(csv).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(200);
             } catch (error) {
               console.log(error);
@@ -91,6 +95,18 @@ export class Api {
           },
           handler: async (request, h) => {
             return { token: request.auth.credentials.token };
+          },
+        },
+        {
+          method: 'GET',
+          path: '/csv',
+          options: {
+            auth: 'jwt',
+          },
+          handler: async (request, h) => {
+            file: '/tmp/data.csv';
+
+            return h.file('/tmp/data.csv');
           },
         },
       ]);
