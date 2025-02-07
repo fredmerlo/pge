@@ -33,7 +33,7 @@
 
 ### Implementation Approach
 
-  The solution is implemented as a Docker image for AWS Lambda, Node.Js, Typescript and Hapi (Server, Routes, Authorization, JWT, HttpClient).
+  The solution is implemented as a Docker image for AWS Lambda, S3, Node.Js, Typescript and Hapi (Server, Routes, Authorization, JWT, Wreck, Inert, Log).
 
   Using this strategy we gain: platform neutrality, consistent feature functionality and a single-codebase for local and cloud operations.
 
@@ -71,9 +71,9 @@ After cloning the repository:
 4. Upon completion the test result summary will display:
    ```
    Test Suites: 4 passed, 4 total
-   Tests:       13 passed, 13 total
+   Tests:       18 passed, 18 total
    Snapshots:   0 total
-   Time:        6.089 s
+   Time:        5.552 s, estimated 6 s
    Ran all test suites.
    ```
 
@@ -86,8 +86,9 @@ From the local repository root directory:
    docker buildx build --load --platform linux/amd64 --provenance=false -t pge .
    ```
    **pge** at the end of the command is the image tag.
+   **NOTE** there is a period (.) at the end of the above command, this tell docker the *Dockerfile* is located in the same directory where we a running docker.
 
-2. After the build completes we can now run the image
+3. After the build completes we can now run the image
    ```
    docker run --mount type=bind,src=/Users/fredmerlo/development/pge/data,dst=/processed --platform linux/amd64 -p 9000:8080 pge  
    ```
@@ -99,7 +100,7 @@ From the local repository root directory:
    + **pge** is the tag assigned to the image during build.
     Now that we have the image running, we can invoke the API.
 
-3. The solution uses JWT for API Authorization, so we need to get a token
+4. The solution uses JWT for API Authorization, so we need to get a token
    ```
    curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"httpMethod":"POST","path":"/token","headers":{"Authorization":"Basic dGVzdDpzdXBlcnNlY3JldA=="}}'
    ```
@@ -114,19 +115,20 @@ From the local repository root directory:
    {"statusCode":200,"headers":{"content-type":"application/json; charset=utf-8","cache-control":"no-cache","content-length":260,"date":"Mon, 03 Feb 2025 17:13:48 GMT","connection":"keep-alive"},"body":"{\"token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMwMDgsImlhdCI6MTczODYwMjgyOH0.ac38kE_0Ct-evDzM2WLfpcXctOAIokDqWAS17fdkRwk\"}"}
    ```
    There's our JWT token.
-4. Now we copy the token invoke the station data API
+5. Now we copy the token invoke the station data API
    ```
    curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"path":"/data","headers":{"Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ1cm46YXVkaWVuY2U6dGVzdCIsImlzcyI6InVybjppc3N1ZXI6cGdlIiwic3ViIjoidGVzdCIsInVzZXIiOiJ0ZXN0IiwiZ3JvdXAiOiJwZ2UiLCJleHAiOjE3Mzg2MDMyODEsImlhdCI6MTczODYwMzEwMX0.wqURjtjzXLK4sQkNN78zQb_ivuH178HP6xn9tquBhYQ"}}'
    ```
    And the response:
    ```
-   {"statusCode":200,"headers":{"content-type":"application/json; charset=utf-8","cache-control":"no-cache","content-length":506,"accept-ranges":"bytes","date":"Mon, 03 Feb 2025 17:19:56 GMT","connection":"keep-alive"},"body":"{\"csv\":\"eightd_has_key_dispenser,capacity,electric_bike_surcharge_waiver,station_type,lon,name,region_id,short_name,lat,has_kiosk,externalId,stationId,legacyId\\nfalse,3,false,classic,-73.9995126,Congress St & Hicks St,71,4497.09,40.6893952,true,b516fedb-3ced-4683-8c17-7e5f6dadf04d,b516fedb-3ced-4683-8c17-7e5f6dadf04d,undefined\\nfalse,3,false,classic,-73.99807110428809,8 Ave & W 24 St,71,6224.06,40.74591072834279,true,1d440638-ec50-4ccb-9a82-0e3247a87c63,1d440638-ec50-4ccb-9a82-0e3247a87c63,undefined\"}"}
+   {"statusCode":200,"headers":{"content-type":"text/csv; charset=utf-8","content-length":259048,"last-modified":"Fri, 07 Feb 2025 23:18:44 GMT","content-disposition":"inline; filename=data.csv","etag":"\"2ef92314636ac0fd70cefa841c772c45de78a9c2\"","cache-control":"no-cache","accept-ranges":"bytes","vary":"accept-encoding","date":"Fri, 07 Feb 2025 23:18:44 GMT","connection":"keep-alive"},"body":"station_type,capacity,lon,eightd_has_key_dispenser,name,short_name,lat,electric_bike_surcharge_waiver,has_kiosk,externalId,stationId,legacyId,address\nclassic,11,-87.67414391040802,false,Damen Ave & 59th St,561,41.785861065132,false,true,a3b22d3d-a135-11e9-9cda-0a87ae2ba916,a3b22d3d-a135-11e9-9cda-0a87ae2ba916,undefined,undefined\nclassic,11,-87.65114,false,Morgan St & 31st St,TA1308000046,41.8378,false,true,a3a9c0f6-a135-11e9-9cda-0a87ae2ba916,a3a9c0f6-a135-11e9-9cda-0a87ae2ba916,undefined,undefined\nclassic,7,-87.674684,false,Damen Ave & 51st St,554,41.800908,false,true,a3b20960-a135-11e9-9cda-0a87ae2ba916,a3b20960-a135-11e9-9cda-0a87ae2ba916,undefined,undefined\nclassic,11,-87.746619,false,Cicero Ave & Flournoy St,16912,41.872131,false,true,a3b13e66-a135-11e9-9cda-0a87ae2ba916,a3b13e66-a135-11e9-9cda-0a87ae2ba916,undefined,undefined\""}
    ```
-5. The processed stations CSV file will be located at the mount point directory.
+6. The processed stations CSV file will be located at the mount point directory.
    ```
    ls /Users/fredmerlo/development/pge/data
    data.csv
    ```
+7. For performance I keep track of the ETag header from the last document that was processed. If there are no changes the CSV will be served from the local file system.
    
 #### Invoking AWS APIGateway API
 I used Terraform to provision the Rest API in AWS, although the target environments differ, the same Docker file was used to build the Lambda image and publish into ECR.
@@ -147,8 +149,11 @@ Invoking the APIGateway Rest API follows the same workflow used for the local La
    ```
    The response:
    ```
-   {"csv":"capacity,has_kiosk,short_name,eightd_has_key_dispenser,lat,region_id,electric_bike_surcharge_waiver,station_type,lon,name,externalId,stationId,legacyId\n3,true,4497.09,false,40.6893952,71,false,classic,-73.9995126,Congress St & Hicks St,b516fedb-3ced-4683-8c17-7e5f6dadf04d,b516fedb-3ced-4683-8c17-7e5f6dadf04d,undefined\n3,true,6224.06,false,40.74591072834279,71,false,classic,-73.99807110428809,8 Ave & W 24 St,1d440638-ec50-4ccb-9a82-0e3247a87c63,1d440638-ec50-4ccb-9a82-0e3247a87c63,undefined"}
+   has_kiosk,eightd_has_key_dispenser,capacity,lat,lon,short_name,electric_bike_surcharge_waiver,station_type,name,externalId,stationId,legacyId,address
+   true,false,11,41.880207,-87.755337,540,false,classic,Laramie Ave & Madison St,a3b148bf-a135-11e9-9cda-0a87ae2ba916,a3b148bf-a135-11e9-9cda-0a87ae2ba916,undefined,undefined
+   true,false,11,41.887832,-87.755527,530,false,classic,Laramie Ave & Kinzie St,a3b11480-a135-11e9-9cda-0a87ae2ba916,a3b11480-a135-11e9-9cda-0a87ae2ba916,undefined,undefined
    ```
+   The CSV data file is stored in S3, again for performance if the source document has not changed, I create a Pre-Signed URL for the CSV file S3 will handle the final response.
 3. The processed stations CSV is located in the S3 bucket
    ```
    aws s3 ls pge-data-bucket
