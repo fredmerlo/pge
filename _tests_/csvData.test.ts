@@ -3,7 +3,6 @@ import { json2csv } from 'json-2-csv';
 import { promises as fs } from 'fs';
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { get } from 'http';
 
 jest.mock('json-2-csv');
 jest.mock('fs', () => ({
@@ -65,10 +64,8 @@ describe('CsvData', () => {
     const mockData = [{ key: 'value' }];
     const mockCsv = 'key,value\nvalue';
     const csvPutObjectCommand = new PutObjectCommand({ Bucket: process.env.FILE_OUTPUT, Key: 'data.csv', Body: mockCsv });
-    // const csvGetObjectCommand = new GetObjectCommand({ Bucket: process.env.FILE_OUTPUT, Key: 'data.csv' });
     
     const mockPut = jest.fn().mockResolvedValue(csvPutObjectCommand);
-    // const mockGet = jest.fn().mockResolvedValue(csvGetObjectCommand);
     
     (json2csv as jest.Mock).mockResolvedValue(mockCsv);
     (S3Client as jest.Mock).mockImplementation(() => ({
@@ -84,27 +81,17 @@ describe('CsvData', () => {
   });
   it('should get CSV from S3 return a signed url', async () => {
     process.env.FILE_OUTPUT = 'S3_BUCKET_NAME';
-    const mockData = [{ key: 'value' }];
-    const mockCsv = 'key,value\nvalue';
     const mockUrl = 'mockurl';
-    const csvPutObjectCommand = new PutObjectCommand({ Bucket: process.env.FILE_OUTPUT, Key: 'data.csv', Body: mockCsv });
     
-    const mockPut = jest.fn().mockResolvedValue(csvPutObjectCommand);
-    
-    (json2csv as jest.Mock).mockResolvedValue(mockCsv);
-    (S3Client as jest.Mock).mockImplementation(() => ({
-      send: mockPut
-    }));
-
+    (S3Client as jest.Mock).mockReturnThis();
     const s3 = new S3Client();
-    
+
     (getSignedUrl as jest.Mock).mockImplementation(() => {
       getSignedUrl(s3, new GetObjectCommand({ Bucket: process.env.FILE_OUTPUT, Key: 'data.csv' }), { expiresIn: 300 });
     }).mockResolvedValue(mockUrl);
 
-    const result = await csvData.convert(mockData);
+    const result = await csvData.s3Url();
 
-    expect(json2csv).toHaveBeenCalledWith(mockData);
     expect(getSignedUrl).toHaveBeenCalledWith(s3, new GetObjectCommand({ Bucket: process.env.FILE_OUTPUT, Key: 'data.csv' }), { expiresIn: 300 });
     expect(result).toBe(mockUrl);
   });

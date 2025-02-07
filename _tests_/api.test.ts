@@ -5,14 +5,12 @@ import { ProcessData } from '../src/processData';
 import { CsvData } from '../src/csvData';
 import { Authorizer } from '../src/authorizer';
 import { CommonPlugins } from '../src/commonplugins';
-import { ResponseToolkit, ResponseObject } from '@hapi/hapi';
+import { ResponseToolkit } from '@hapi/hapi';
 import * as inert from '@hapi/inert';
-const internal = require("stream");
 
 jest.mock('../src/httpClient');
 jest.mock('../src/processData');
 jest.mock('../src/csvData');
-// jest.mock('@hapi/inert');
 
 describe('Api', () => {
   let server: Hapi.Server;
@@ -128,5 +126,22 @@ describe('Api', () => {
 
     expect(fileHandle.file).toHaveBeenCalledWith('/tmp/data.csv', { confine: false, mode: 'inline' });
     expect(getRoute.statusCode).toBe(200);
+  });
+  it('should GET /data as redirect using S3 presignedurl', async () => {
+    process.env.FILE_OUTPUT = 'S3_BUCKET_NAME';
+    await api.init();
+    server.app = { lastEtag: 'undefined' };
+
+    (httpClient.head as jest.Mock).mockResolvedValue({ lastModified: undefined, etag: 'undefined' });
+    
+    csvData.s3Url = jest.fn().mockResolvedValue('https://localhost/S3_BUCKET_NAME/data.csv');
+
+    await csvData.s3Url();
+
+    const postRoute = await server.inject({ method: 'POST', url: '/token', headers: { authorization: 'Basic ' + (Buffer.from('test:supersecret', 'utf8')).toString('base64') } });
+    const getRoute = await server.inject({ method: 'GET', url: '/data', headers: { authorization: 'Bearer ' + (postRoute.result as any).token } },);
+
+    expect(getRoute.statusCode).toBe(302);
+    expect(getRoute.headers.location).toBe('https://localhost/S3_BUCKET_NAME/data.csv');
   });
 });

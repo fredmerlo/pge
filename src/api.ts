@@ -70,7 +70,8 @@ export class Api {
               }
 
               if (FILE_OUTPUT !== "LOCAL") {
-                return h.redirect(csv).code(302);
+                const url = await this.csvData.s3Url();
+                return h.redirect(url).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(302);
               }
 
               if (h.file) {
