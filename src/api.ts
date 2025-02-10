@@ -12,10 +12,15 @@ export interface IApiState extends Hapi.ServerApplicationState {
 
 export class Api {
   public server: Hapi.Server;
+  // @ts-ignore
   public httpClient: HttpClient;
+  // @ts-ignore
   public processor: ProcessData;
+  // @ts-ignore
   public authorizer: Authorizer;
+  // @ts-ignore
   public csvData: CsvData;
+  // @ts-ignore
   public commonPlugins: CommonPlugins;
 
   constructor() {
@@ -53,35 +58,34 @@ export class Api {
             auth: 'jwt',
           },
           handler: async (request, h) => {
-            const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
-            let csv = '';
+            const isLocal = (process.env.FILE_OUTPUT || "LOCAL") === "LOCAL";
+
             try {
-              // const data = await this.httpClient.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json');
               const { lastModified, etag } = await this.httpClient.head('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
-              if (!etag || (this.server.app as IApiState).lastEtag !== etag) {
+              const isNewEtag = !etag || (this.server.app as IApiState).lastEtag !== etag;
+
+              if (isNewEtag) {
                 const data = await this.httpClient.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
                 const processedData = await this.processor.process(data);
-                csv = await this.csvData.convert(processedData);
+                const csv = await this.csvData.convert(processedData);
+                (this.server.app as IApiState).lastEtag = etag;
+                // await this.processor.process2('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
 
-                await new Promise((resolve) => {
-                  (this.server.app as IApiState).lastEtag = etag;
-                  resolve(true);
-                });
+                // // New csv data was found respond with the processed payload
+                return h.response(csv).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(200);
               }
 
-              if (FILE_OUTPUT !== "LOCAL") {
+              if ( isLocal ) {
+                if (h.file) {
+                  return h.file('/tmp/data.csv', {
+                    confine: false,
+                    mode: 'inline'
+                  }).encoding('utf8').type('text/csv').code(200);
+                }
+              } else {
                 const url = await this.csvData.s3Url();
                 return h.redirect(url).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(302);
               }
-
-              if (h.file) {
-                return h.file('/tmp/data.csv', {
-                  confine: false,
-                  mode: 'inline'
-                }).encoding('utf8').type('text/csv').code(200);
-              }
-
-              return h.response(csv).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(200);
             } catch (error) {
               console.log(error);
               return h.response({ error: 'An error occurred' }).code(500);

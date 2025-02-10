@@ -1,6 +1,8 @@
 import * as Hapi from '@hapi/hapi';
 import * as Inert from '@hapi/inert';
-import * as Log from '@hapi/log/lib';
+
+// @ts-ignore
+const Log = require('@hapi/log/lib');
 
 export class CommonPlugins {
 
