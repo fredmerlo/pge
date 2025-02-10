@@ -8,7 +8,8 @@ export class Authorizer {
   public BasicAuthorizer(server: Hapi.Server) {
     server.register(Basic);
     server.auth.strategy('default', 'basic', {
-      validate: async (request, username, password, h) => {
+      validate: async (request: any, username: string, password: string, h: any) => {
+        const MAX_AGE = process.env.MAX_AGE || '3600';
         if (username === 'test' && password === secret) {
           const token = Jwt.token.generate(
             {
@@ -17,7 +18,7 @@ export class Authorizer {
               sub: 'test',
               user: 'test',
               group: 'pge',
-              exp: Math.floor(Date.now() / 1000) + 180,
+              exp: Math.floor(Date.now() / 1000) + Number.parseInt(MAX_AGE),
             },
             secret,
           );
@@ -30,13 +31,14 @@ export class Authorizer {
   }
 
   public JwtAuthorizer(server: Hapi.Server) {
+    const MAX_AGE = process.env.MAX_AGE || '3600';
     server.register(Jwt);
     server.auth.strategy('jwt', 'jwt', {
       verify: {
         aud: 'urn:audience:test',
         iss: 'urn:issuer:pge',
         sub: 'test',
-        maxAgeSec: 180,
+        maxAgeSec: Number.parseInt(MAX_AGE),
       },
       validate: async (artifacts, request, h) => {
         return { isValid: true };

@@ -64,6 +64,7 @@ describe('Api', () => {
   });
   it('should handle GET /data authenticated', async () => {
     await api.init();
+    // @ts-ignore
     server.decorate('toolkit', 'file', (request, h) => { }, { extend: true, apply: true });
 
     (httpClient.head as jest.Mock).mockResolvedValue({ lastModified: undefined, etag: 'undefined' });
@@ -116,6 +117,7 @@ describe('Api', () => {
       unauthenticated: jest.fn(),
       unstate: jest.fn()
     }
+    // @ts-ignore
     server.decorate('toolkit', 'file', (request, h) => { return fileHandle.file; }, { extend: true, apply: true });
     server.app = { lastEtag: 'undefined' };
 

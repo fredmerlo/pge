@@ -21,11 +21,6 @@ export class HttpClient {
       console.log(`Fetching data from ${url}`);
       const {res, payload } = await wreck.get<string>(url);
       console.log(`Received data ${payload.length} bytes from ${url}`);
-      
-      this.localData.lastModified = lastModified;
-      this.localData.etag = etag;
-      this.localData.data = payload;
-
       return payload;
     }
 
