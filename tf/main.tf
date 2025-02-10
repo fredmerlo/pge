@@ -58,8 +58,11 @@ module "lambda_function_with_docker_build_from_ecr" {
   function_name = "pge-lambda-with-docker-build-from-ecr"
   description   = "PGE Test"
 
+  timeout = 5
+
   environment_variables = {
     FILE_OUTPUT = aws_s3_bucket.pge_data_bucket.bucket
+    MAX_AGE = "180"
   }
 
   create_package = false
