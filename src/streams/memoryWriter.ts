@@ -1,5 +1,4 @@
 import { Writable, WritableOptions } from 'node:stream';
-import { MemoryReader } from './memoryReader';
 import { PayloadBuffer } from './payloadBuffer';
 
 export class MemoryWriter extends Writable {
