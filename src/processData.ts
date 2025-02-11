@@ -1,11 +1,16 @@
 import { parser } from 'stream-json';
 import { pick } from 'stream-json/filters/Pick';
 import { streamArray } from 'stream-json/streamers/StreamArray';
+import { disassembler } from 'stream-json/Disassembler';
+import { batch } from 'stream-json/utils/Batch';
+import { chain } from 'stream-chain';
 import * as fs from 'fs';
 import * as https from 'https';
 import { IncomingMessage } from 'http';
 import { json2csv } from 'json-2-csv';
-import { Transform } from 'stream';
+import { Upload } from "@aws-sdk/lib-storage";
+import { PassThrough, Transform, Readable, ReadableOptions } from 'node:stream';
+import { S3Client } from "@aws-sdk/client-s3";
 
 export interface IBaseStation {
   station_type?: string;
@@ -89,7 +94,7 @@ export class ProcessData {
     });
   }
 
-  async process2(url: string): Promise<void> {
+  async processLocal(url: string): Promise<void> {
     const json = await new Promise<IncomingMessage>((resolve, reject) => {
       https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
         res.readableObjectMode
@@ -98,48 +103,169 @@ export class ProcessData {
     });
 
     return new Promise<void>((resolve, reject) => {
-      const transformer = new Transform({
-        objectMode: false,
-        highWaterMark: 4096,
-        transform(chunk: any, encoding, callback) {
-
-          const chunkStr = chunk.toString('utf8');
-
-          this.push(chunkStr);
-
+      const csv = new Transform({
+        readableObjectMode: false,
+        writableObjectMode: true,
+        encoding: 'utf8',
+        transform(chunk, encoding, callback) {
+          if (chunk.name === 'stringValue' && chunk.value && chunk.value.length) {
+            const encodedChunk = chunk.value.toString(encoding);
+            this.push(encodedChunk);
+          }
           callback();
         },
       });
-      const csv = fs.createWriteStream('/tmp/data.csv', { encoding: 'utf8', highWaterMark: 4096 });
 
-      let stationsProcessed: number = 0;
       let stationsInCapacity: number = 0;
-
-      json
-        .pipe(parser())
-        .pipe(pick({ filter: /\bstations\b/ }))
-        .pipe(streamArray({ objectMode: true, highWaterMark: 50 }))
-        .on('data', (data) => {
-          const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = data.value;
+      const ch = chain([
+        json,
+        parser(),
+        pick({ filter: /\bstations\b/ }),
+        streamArray(),
+        data => {
+          const value: IStation = data.value;
+          const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = value;
           if (data.value.capacity < 12) {
             stationsInCapacity++;
-            transformer.write(json2csv([{
-              ...rest,
+            // station_type,name,eightd_has_key_dispenser,has_kiosk,lat,electric_bike_surcharge_waiver,short_name,lon,capacity,externalId,stationId,legacyId,address
+            return json2csv([{
+              station_type: rest.station_type,
+              name: rest.name,
+              eightd_has_key_dispenser: rest.eightd_has_key_dispenser,
+              has_kiosk: rest.has_kiosk,
+              lat: rest.lat,
+              electric_bike_surcharge_waiver: rest.electric_bike_surcharge_waiver,
+              short_name: rest.short_name,
+              lon: rest.lon,
+              capacity: rest.capacity,
               externalId: external_id,
               stationId: station_id,
-              legacyId: legacy_id
-            }], { prependHeader: stationsInCapacity === 1 }) + '\r\n');
+              legacyId: legacy_id,
+              address: rest.address
+            } as IRenamedStation], { prependHeader: stationsInCapacity === 1 }) + '\r\n'
           }
-          stationsProcessed++;
+          return null;
+        },
+        batch({ batchSize: 500 }),
+        disassembler(),
+        csv,
+        fs.createWriteStream('/tmp/data.csv')
+      ]);
+
+      ch.on('end', () => {
+        resolve();
+      });
+    });
+  }
+
+  async processAWS(url: string): Promise<void> {
+    const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
+
+    const json = await new Promise<IncomingMessage>((resolve, reject) => {
+      https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
+        res.readableObjectMode
+        resolve(res);
+      }).on('error', (error) => { reject(error); });
+    });
+
+    const s3 = new S3Client();
+
+    let contentLength = 0;
+
+    class Memory extends Readable {
+      public _offset: number = 0;
+      public readableLength: number = 0;
+
+      constructor(opts?: ReadableOptions & { readableLength: number, bodyLengthChecker: (body: any) => any }) {
+        super(opts);
+      }
+      locked: boolean = false;
+    }
+
+    const prom = new Promise<Upload>((resolve, reject) => {
+      const rows = new Array<string>();
+      const csv = new Transform({
+        readableObjectMode: false,
+        writableObjectMode: true,
+        encoding: 'utf8',
+
+        transform(chunk, encoding, callback) {
+          if (chunk.name === 'stringValue' && chunk.value && chunk.value.length) {
+            const encodedChunk = chunk.value.toString(encoding);
+            contentLength += encodedChunk.length;
+            rows.push(encodedChunk);
+            this.push(encodedChunk);
+          }
+          callback();
+        },
+      });
+
+      const output = fs.createWriteStream('/dev/null');
+      const passThrough = new PassThrough();
+
+      let stationsInCapacity: number = 0;
+      const ch = chain([
+        json,
+        parser(),
+        pick({ filter: /\bstations\b/ }),
+        streamArray(),
+        data => {
+          const value: IStation = data.value;
+          const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = value;
+          if (data.value.capacity < 12) {
+            stationsInCapacity++;
+            // station_type,name,eightd_has_key_dispenser,has_kiosk,lat,electric_bike_surcharge_waiver,short_name,lon,capacity,externalId,stationId,legacyId,address
+            return json2csv([{
+              station_type: rest.station_type,
+              name: rest.name,
+              eightd_has_key_dispenser: rest.eightd_has_key_dispenser,
+              has_kiosk: rest.has_kiosk,
+              lat: rest.lat,
+              electric_bike_surcharge_waiver: rest.electric_bike_surcharge_waiver,
+              short_name: rest.short_name,
+              lon: rest.lon,
+              capacity: rest.capacity,
+              externalId: external_id,
+              stationId: station_id,
+              legacyId: legacy_id,
+              address: rest.address
+            } as IRenamedStation], { prependHeader: stationsInCapacity === 1 }) + '\r\n'
+          }
+          return null;
+        },
+        disassembler(),
+        csv,
+        output
+      ]);
+
+      ch.on('end', () => {
+
+        const allRows = rows.join('');
+        const buff = Buffer.from(allRows);
+
+        const mem = new Memory({
+          read(size) {
+            if ((this as Memory)._offset === undefined) {
+              (this as Memory)._offset = 0;
+            }
+            const chunk = buff.subarray((this as Memory)._offset, (this as Memory)._offset + size);
+            (this as Memory)._offset += chunk.length;
+            this.push(chunk.length > 0 ? chunk : null);
+          }, objectMode: false, readableLength: contentLength, bodyLengthChecker: (body: any) => { return contentLength; }
         });
 
-      transformer.pipe(csv)
-        .on('finish', () => {
-          resolve();
-        })
-        .on('error', (error) => {
-          reject(error);
-        });
+        resolve(new Upload({
+          client: s3,
+          params: {
+            Bucket: FILE_OUTPUT,
+            Key: 'data.csv',
+            Body: mem,
+          },
+        }));
+      });
     });
+
+    const put = await prom;
+    await put.done();
   }
 } 

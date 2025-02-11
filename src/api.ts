@@ -12,16 +12,12 @@ export interface IApiState extends Hapi.ServerApplicationState {
 
 export class Api {
   public server: Hapi.Server;
-  // @ts-ignore
-  public httpClient: HttpClient;
-  // @ts-ignore
-  public processor: ProcessData;
-  // @ts-ignore
-  public authorizer: Authorizer;
-  // @ts-ignore
-  public csvData: CsvData;
-  // @ts-ignore
-  public commonPlugins: CommonPlugins;
+
+  public httpClient!: HttpClient;
+  public processor!: ProcessData;
+  public authorizer!: Authorizer;
+  public csvData!: CsvData;
+  public commonPlugins!: CommonPlugins;
 
   constructor() {
 
@@ -65,17 +61,22 @@ export class Api {
               const isNewEtag = !etag || (this.server.app as IApiState).lastEtag !== etag;
 
               if (isNewEtag) {
-                const data = await this.httpClient.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
-                const processedData = await this.processor.process(data);
-                const csv = await this.csvData.convert(processedData);
+                // const data = await this.httpClient.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
+                // const processedData = await this.processor.process(data);
+                // const csv = await this.csvData.convert(processedData);
                 (this.server.app as IApiState).lastEtag = etag;
-                // await this.processor.process2('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
+
+                if (isLocal) {
+                  await this.processor.processLocal('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
+                } else {
+                  await this.processor.processAWS('https://gbfs.divvybikes.com/gbfs/en/station_information.json');
+                }
 
                 // // New csv data was found respond with the processed payload
-                return h.response(csv).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(200);
+                // return h.response(csv).type('text/csv').encoding('utf8').header('content-disposition', 'inline; filename=data.csv').code(200);
               }
 
-              if ( isLocal ) {
+              if (isLocal) {
                 if (h.file) {
                   return h.file('/tmp/data.csv', {
                     confine: false,
