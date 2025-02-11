@@ -1,19 +1,19 @@
 import { Writable, WritableOptions } from 'node:stream';
 import { MemoryReader } from './memoryReader';
+import { PayloadBuffer } from './payloadBuffer';
 
 export class MemoryWriter extends Writable {
+  buffer: PayloadBuffer;
   locked: boolean = false;
-  reader: MemoryReader;
 
-  constructor(reader: MemoryReader, opts?: WritableOptions | undefined) {
+  constructor(buffer: PayloadBuffer, opts?: WritableOptions | undefined) {
     super(opts);
-    this.reader = reader;
+    this.buffer = buffer;
   }
 
   _write(chunk: any, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
     if (chunk && chunk.length) {
-      this.reader.buffer = Buffer.concat([this.reader.buffer, chunk]);
-      this.reader.contentLength += chunk.length;
+      this.buffer.putChunk(chunk);
     }
 
     callback();

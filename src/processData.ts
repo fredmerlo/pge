@@ -1,18 +1,12 @@
-import { parser } from 'stream-json';
-import { pick } from 'stream-json/filters/Pick';
-import { streamArray } from 'stream-json/streamers/StreamArray';
-import { disassembler } from 'stream-json/Disassembler';
-import { batch } from 'stream-json/utils/Batch';
-import { chain } from 'stream-chain';
 import * as fs from 'fs';
 import * as https from 'https';
 import { IncomingMessage } from 'http';
-import { json2csv } from 'json-2-csv';
 import { Upload } from "@aws-sdk/lib-storage";
 import { S3Client } from "@aws-sdk/client-s3";
-import { ArrayTransform } from './streams/arrayTransform';
 import { MemoryReader } from './streams/memoryReader';
 import { MemoryWriter } from './streams/memoryWriter';
+import { PayloadBuffer } from './streams/payloadBuffer';
+import { ChainBuilder } from './streams/chainBuilder';
 
 export interface IBaseStation {
   station_type?: string;
@@ -105,47 +99,11 @@ export class ProcessData {
     });
 
     return new Promise<void>((resolve, reject) => {
-      const csv = new ArrayTransform({
-        readableObjectMode: false,
-        writableObjectMode: true,
-        encoding: 'utf8',
-      });
+      const stationsInCapacity = { count: 0 };
+      const fileWriter = fs.createWriteStream('/tmp/data.csv');
+      const chainBuilder = new ChainBuilder(json, fileWriter);
 
-      let stationsInCapacity: number = 0;
-      const ch = chain([
-        json,
-        parser(),
-        pick({ filter: /\bstations\b/ }),
-        streamArray(),
-        data => {
-          const value: IStation = data.value;
-          const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = value;
-          if (data.value.capacity < 12) {
-            stationsInCapacity++;
-            // station_type,name,eightd_has_key_dispenser,has_kiosk,lat,electric_bike_surcharge_waiver,short_name,lon,capacity,externalId,stationId,legacyId,address
-            return json2csv([{
-              station_type: rest.station_type,
-              name: rest.name,
-              eightd_has_key_dispenser: rest.eightd_has_key_dispenser,
-              has_kiosk: rest.has_kiosk,
-              lat: rest.lat,
-              electric_bike_surcharge_waiver: rest.electric_bike_surcharge_waiver,
-              short_name: rest.short_name,
-              lon: rest.lon,
-              capacity: rest.capacity,
-              externalId: external_id,
-              stationId: station_id,
-              legacyId: legacy_id,
-              address: rest.address
-            } as IRenamedStation], { prependHeader: stationsInCapacity === 1 }) + '\r\n'
-          }
-          return null;
-        },
-        batch({ batchSize: 500 }),
-        disassembler(),
-        csv,
-        fs.createWriteStream('/tmp/data.csv')
-      ]);
+      const ch = chainBuilder.getChain(stationsInCapacity);
 
       ch.on('end', () => {
         resolve();
@@ -166,49 +124,13 @@ export class ProcessData {
     const s3 = new S3Client();
 
     const prom = new Promise<Upload>((resolve, reject) => {
-      const csv = new ArrayTransform({
-        readableObjectMode: false,
-        writableObjectMode: true,
-        encoding: 'utf8',
-      });
+      const stationsInCapacity = { count: 0 };
+      const payloadBuffer = new PayloadBuffer();
+      const memoryReader = new MemoryReader(payloadBuffer);
+      const memoryWriter = new MemoryWriter(payloadBuffer);
+      const chainBuilder = new ChainBuilder(json, memoryWriter);
 
-      const memoryReader = new MemoryReader();
-      const memoryWriter = new MemoryWriter(memoryReader);
-
-      let stationsInCapacity: number = 0;
-      const ch = chain([
-        json,
-        parser(),
-        pick({ filter: /\bstations\b/ }),
-        streamArray(),
-        data => {
-          const value: IStation = data.value;
-          const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = value;
-          if (data.value.capacity < 12) {
-            stationsInCapacity++;
-            // station_type,name,eightd_has_key_dispenser,has_kiosk,lat,electric_bike_surcharge_waiver,short_name,lon,capacity,externalId,stationId,legacyId,address
-            return json2csv([{
-              station_type: rest.station_type,
-              name: rest.name,
-              eightd_has_key_dispenser: rest.eightd_has_key_dispenser,
-              has_kiosk: rest.has_kiosk,
-              lat: rest.lat,
-              electric_bike_surcharge_waiver: rest.electric_bike_surcharge_waiver,
-              short_name: rest.short_name,
-              lon: rest.lon,
-              capacity: rest.capacity,
-              externalId: external_id,
-              stationId: station_id,
-              legacyId: legacy_id,
-              address: rest.address
-            } as IRenamedStation], { prependHeader: stationsInCapacity === 1 }) + '\r\n'
-          }
-          return null;
-        },
-        disassembler(),
-        csv,
-        memoryWriter
-      ]);
+      const ch = chainBuilder.getChain(stationsInCapacity);
 
       memoryWriter.on('end', async () => {
         resolve(new Upload({
