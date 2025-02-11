@@ -9,8 +9,10 @@ import * as https from 'https';
 import { IncomingMessage } from 'http';
 import { json2csv } from 'json-2-csv';
 import { Upload } from "@aws-sdk/lib-storage";
-import { PassThrough, Transform, Readable, ReadableOptions } from 'node:stream';
 import { S3Client } from "@aws-sdk/client-s3";
+import { ArrayTransform } from './streams/arrayTransform';
+import { MemoryReader } from './streams/memoryReader';
+import { MemoryWriter } from './streams/memoryWriter';
 
 export interface IBaseStation {
   station_type?: string;
@@ -96,24 +98,17 @@ export class ProcessData {
 
   async processLocal(url: string): Promise<void> {
     const json = await new Promise<IncomingMessage>((resolve, reject) => {
-      https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
+      https.get(url, (res) => {
         res.readableObjectMode
         resolve(res);
       }).on('error', (error) => { reject(error); });
     });
 
     return new Promise<void>((resolve, reject) => {
-      const csv = new Transform({
+      const csv = new ArrayTransform({
         readableObjectMode: false,
         writableObjectMode: true,
         encoding: 'utf8',
-        transform(chunk, encoding, callback) {
-          if (chunk.name === 'stringValue' && chunk.value && chunk.value.length) {
-            const encodedChunk = chunk.value.toString(encoding);
-            this.push(encodedChunk);
-          }
-          callback();
-        },
       });
 
       let stationsInCapacity: number = 0;
@@ -162,7 +157,7 @@ export class ProcessData {
     const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
 
     const json = await new Promise<IncomingMessage>((resolve, reject) => {
-      https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
+      https.get(url, (res) => {
         res.readableObjectMode
         resolve(res);
       }).on('error', (error) => { reject(error); });
@@ -170,38 +165,15 @@ export class ProcessData {
 
     const s3 = new S3Client();
 
-    let contentLength = 0;
-
-    class Memory extends Readable {
-      public _offset: number = 0;
-      public readableLength: number = 0;
-
-      constructor(opts?: ReadableOptions & { readableLength: number, bodyLengthChecker: (body: any) => any }) {
-        super(opts);
-      }
-      locked: boolean = false;
-    }
-
     const prom = new Promise<Upload>((resolve, reject) => {
-      const rows = new Array<string>();
-      const csv = new Transform({
+      const csv = new ArrayTransform({
         readableObjectMode: false,
         writableObjectMode: true,
         encoding: 'utf8',
-
-        transform(chunk, encoding, callback) {
-          if (chunk.name === 'stringValue' && chunk.value && chunk.value.length) {
-            const encodedChunk = chunk.value.toString(encoding);
-            contentLength += encodedChunk.length;
-            rows.push(encodedChunk);
-            this.push(encodedChunk);
-          }
-          callback();
-        },
       });
 
-      const output = fs.createWriteStream('/dev/null');
-      const passThrough = new PassThrough();
+      const memoryReader = new MemoryReader();
+      const memoryWriter = new MemoryWriter(memoryReader);
 
       let stationsInCapacity: number = 0;
       const ch = chain([
@@ -235,37 +207,22 @@ export class ProcessData {
         },
         disassembler(),
         csv,
-        output
+        memoryWriter
       ]);
 
-      ch.on('end', () => {
-
-        const allRows = rows.join('');
-        const buff = Buffer.from(allRows);
-
-        const mem = new Memory({
-          read(size) {
-            if ((this as Memory)._offset === undefined) {
-              (this as Memory)._offset = 0;
-            }
-            const chunk = buff.subarray((this as Memory)._offset, (this as Memory)._offset + size);
-            (this as Memory)._offset += chunk.length;
-            this.push(chunk.length > 0 ? chunk : null);
-          }, objectMode: false, readableLength: contentLength, bodyLengthChecker: (body: any) => { return contentLength; }
-        });
-
+      memoryWriter.on('end', async () => {
         resolve(new Upload({
           client: s3,
           params: {
             Bucket: FILE_OUTPUT,
             Key: 'data.csv',
-            Body: mem,
+            Body: memoryReader,
           },
         }));
       });
     });
 
-    const put = await prom;
-    await put.done();
+    const pipe = await prom;
+    await pipe.done();
   }
 } 
