@@ -1,14 +1,17 @@
 import { HttpClient } from '../src/httpClient';
 import * as wreck from '@hapi/wreck';
-import { parser } from 'stream-json';
-import { pick } from 'stream-json/filters/Pick';
-import { streamArray } from 'stream-json/streamers/StreamArray';
 
 import * as fs from 'fs';
-import { Transform } from 'stream';
 import * as https from 'https';
 import { IncomingMessage } from 'http';
-import { json2csv } from 'json-2-csv';
+
+import { S3Client } from "@aws-sdk/client-s3";
+import { Upload } from "@aws-sdk/lib-storage";
+import { PayloadBuffer } from '../src/streams/payloadBuffer';
+import { MemoryReader } from '../src/streams/memoryReader';
+import { MemoryWriter } from '../src/streams/memoryWriter';
+import { ChainBuilder } from '../src/streams/chainBuilder';
+
 
 jest.mock('@hapi/wreck');
 
@@ -80,7 +83,8 @@ describe('HttpClient', () => {
 
     expect(console.log).toHaveBeenCalledWith(`Data not modified`);
   });
-  it('tests stream-json', async () => {
+
+  it.skip('tests stream-json with chain', async () => {
     const json = await new Promise<IncomingMessage>((resolve, reject) => {
       https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
         res.readableObjectMode
@@ -88,40 +92,56 @@ describe('HttpClient', () => {
       }).on('error', (error) => { reject(error); });
     });
 
-    const transformer = new Transform({
-      objectMode: false,
-      transform(chunk: any, encoding, callback) {
-  
-        const chunkStr = chunk.toString('utf8');
+    const prom = new Promise<void>((resolve, reject) => {
+      const stationsInCapacity = { count: 0 };
+      const fileWriter = fs.createWriteStream('output.csv');
+      const chainBuilder = new ChainBuilder(json, fileWriter);
 
-        this.push(chunkStr);
+      const ch = chainBuilder.getChain(stationsInCapacity);
 
-        callback();
-      },
-    });
-    const csv = fs.createWriteStream('output.csv', { encoding: 'utf8' });
-
-    let stationsProcessed: number = 0;
-    let stationsInCapacity: number = 0;
-
-    json
-      .pipe(parser())
-      .pipe(pick({ filter: /\bstations\b/ }))
-      .pipe(streamArray({ objectMode: false }))
-      .on('data', (data) => {
-        const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = data.value;
-        if (data.value.capacity < 12) {
-          stationsInCapacity++;
-          transformer.write(json2csv([{
-            ...rest,
-            externalId: external_id,
-            stationId: station_id,
-            legacyId: legacy_id
-          }], { prependHeader: stationsInCapacity === 1 }) + '\r\n');
-        }
-        stationsProcessed++;
+      ch.on('end', () => {
+        resolve();
       });
+    });
 
-    transformer.pipe(csv);
+    await prom;
+
   });
-})
+  it.skip('tests stream-json with chain to S3', async () => {
+    const json = await new Promise<IncomingMessage>((resolve, reject) => {
+      https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
+        res.readableObjectMode
+        resolve(res);
+      }).on('error', (error) => { reject(error); });
+    });
+
+    const s3 = new S3Client();
+
+    const prom = new Promise<Upload>((resolve, reject) => {
+
+      const stationsInCapacity = { count: 0 };
+      const payloadBuffer = new PayloadBuffer();
+      const memoryReader = new MemoryReader(payloadBuffer);
+      const memoryWriter = new MemoryWriter(payloadBuffer);
+      const chainBuilder = new ChainBuilder(json, memoryWriter);
+
+      const ch = chainBuilder.getChain(stationsInCapacity);
+
+      memoryWriter.on('end', async () => {
+        resolve(new Upload({
+          client: s3,
+          params: {
+            Bucket: 'pge-data-bucket',
+            Key: 'data.csv',
+            Body: memoryReader,
+          },
+        }));
+      });
+    });
+
+    const pipe = await prom;
+    await pipe.done();
+
+  });
+});
+

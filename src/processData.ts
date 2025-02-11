@@ -1,11 +1,12 @@
-import { parser } from 'stream-json';
-import { pick } from 'stream-json/filters/Pick';
-import { streamArray } from 'stream-json/streamers/StreamArray';
 import * as fs from 'fs';
 import * as https from 'https';
 import { IncomingMessage } from 'http';
-import { json2csv } from 'json-2-csv';
-import { Transform } from 'stream';
+import { Upload } from "@aws-sdk/lib-storage";
+import { S3Client } from "@aws-sdk/client-s3";
+import { MemoryReader } from './streams/memoryReader';
+import { MemoryWriter } from './streams/memoryWriter';
+import { PayloadBuffer } from './streams/payloadBuffer';
+import { ChainBuilder } from './streams/chainBuilder';
 
 export interface IBaseStation {
   station_type?: string;
@@ -89,57 +90,61 @@ export class ProcessData {
     });
   }
 
-  async process2(url: string): Promise<void> {
+  async processLocal(url: string): Promise<void> {
     const json = await new Promise<IncomingMessage>((resolve, reject) => {
-      https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
+      https.get(url, (res) => {
         res.readableObjectMode
         resolve(res);
       }).on('error', (error) => { reject(error); });
     });
 
     return new Promise<void>((resolve, reject) => {
-      const transformer = new Transform({
-        objectMode: false,
-        highWaterMark: 4096,
-        transform(chunk: any, encoding, callback) {
+      const stationsInCapacity = { count: 0 };
+      const fileWriter = fs.createWriteStream('/tmp/data.csv');
+      const chainBuilder = new ChainBuilder(json, fileWriter);
 
-          const chunkStr = chunk.toString('utf8');
+      const ch = chainBuilder.getChain(stationsInCapacity);
 
-          this.push(chunkStr);
-
-          callback();
-        },
+      ch.on('end', () => {
+        resolve();
       });
-      const csv = fs.createWriteStream('/tmp/data.csv', { encoding: 'utf8', highWaterMark: 4096 });
-
-      let stationsProcessed: number = 0;
-      let stationsInCapacity: number = 0;
-
-      json
-        .pipe(parser())
-        .pipe(pick({ filter: /\bstations\b/ }))
-        .pipe(streamArray({ objectMode: true, highWaterMark: 50 }))
-        .on('data', (data) => {
-          const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = data.value;
-          if (data.value.capacity < 12) {
-            stationsInCapacity++;
-            transformer.write(json2csv([{
-              ...rest,
-              externalId: external_id,
-              stationId: station_id,
-              legacyId: legacy_id
-            }], { prependHeader: stationsInCapacity === 1 }) + '\r\n');
-          }
-          stationsProcessed++;
-        });
-
-      transformer.pipe(csv)
-        .on('finish', () => {
-          resolve();
-        })
-        .on('error', (error) => {
-          reject(error);
-        });
     });
+  }
+
+  async processAWS(url: string): Promise<void> {
+    const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
+
+    const json = await new Promise<IncomingMessage>((resolve, reject) => {
+      https.get(url, (res) => {
+        res.readableObjectMode
+        resolve(res);
+      }).on('error', (error) => { reject(error); });
+    });
+
+    const s3 = new S3Client();
+
+    const prom = new Promise<Upload>((resolve, reject) => {
+      const stationsInCapacity = { count: 0 };
+      const payloadBuffer = new PayloadBuffer();
+      const memoryReader = new MemoryReader(payloadBuffer);
+      const memoryWriter = new MemoryWriter(payloadBuffer);
+      const chainBuilder = new ChainBuilder(json, memoryWriter);
+
+      const ch = chainBuilder.getChain(stationsInCapacity);
+
+      memoryWriter.on('end', async () => {
+        resolve(new Upload({
+          client: s3,
+          params: {
+            Bucket: FILE_OUTPUT,
+            Key: 'data.csv',
+            Body: memoryReader,
+          },
+        }));
+      });
+    });
+
+    const pipe = await prom;
+    await pipe.done();
   }
 } 
