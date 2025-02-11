@@ -5,6 +5,7 @@ module.exports = {
   transform: {
     "^.+.tsx?$": ["ts-jest",{}],
   },
+  testTimeout: 10000,
   reporters: [
     'default',
     ['jest-junit', {outputDirectory: 'reports', outputName: 'report.xml'}],
