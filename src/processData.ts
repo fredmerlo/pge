@@ -93,7 +93,6 @@ export class ProcessData {
   async processLocal(url: string): Promise<void> {
     const json = await new Promise<IncomingMessage>((resolve, reject) => {
       https.get(url, (res) => {
-        res.readableObjectMode
         resolve(res);
       }).on('error', (error) => { reject(error); });
     });
@@ -120,7 +119,6 @@ export class ProcessData {
 
     const json = await new Promise<IncomingMessage>((resolve, reject) => {
       https.get(url, (res) => {
-        res.readableObjectMode
         resolve(res);
       }).on('error', (error) => { reject(error); });
     });
@@ -134,7 +132,7 @@ export class ProcessData {
         const memoryWriter = new MemoryWriter(payloadBuffer);
         const chainBuilder = new ChainBuilder(json, memoryWriter);
 
-        const ch = chainBuilder.getChain(stationsInCapacity);
+        const ch = chainBuilder.getPipeline(stationsInCapacity);
 
         memoryWriter.on('end', async () => {
           const up = new Upload({

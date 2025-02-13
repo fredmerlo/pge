@@ -112,7 +112,7 @@ describe('HttpClient', () => {
     await prom;
 
   });
-  it.skip('tests stream-json with chain to S3', async () => {
+  it.skip('tests stream-json with pipeline to S3', async () => {
     const json = await new Promise<IncomingMessage>((resolve, reject) => {
       https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
         res.readableObjectMode
@@ -129,7 +129,7 @@ describe('HttpClient', () => {
         const memoryWriter = new MemoryWriter(payloadBuffer);
         const chainBuilder = new ChainBuilder(json, memoryWriter);
 
-        const ch = chainBuilder.getChain(stationsInCapacity);
+        const ch = chainBuilder.getPipeline(stationsInCapacity);
 
         memoryWriter.on('end', async () => {
           const up = new Upload({
@@ -150,4 +150,3 @@ describe('HttpClient', () => {
     await prom;
   });
 });
-
