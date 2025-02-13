@@ -6,7 +6,7 @@ data "aws_ecr_authorization_token" "token" {}
 
 locals {
   source_path   = "../"
-  path_include  = ["src/**", "Dockerfile", "package.json" ]
+  path_include  = ["src/*.ts", "Dockerfile", "package.json" ]
   path_exclude  = ["**/_tests_/**", "dist/**", "node_modules/**", "**/.git/**", "**/.vscode/**", "tf/**", "*.csv", "jest.config.js", "data.json", "data/**", "package-lock.json", "tsconfig.json"]
   files_include = setunion([for f in local.path_include : fileset(local.source_path, f)]...)
   files_exclude = setunion([for f in local.path_exclude : fileset(local.source_path, f)]...)
