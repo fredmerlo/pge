@@ -6,8 +6,8 @@ data "aws_ecr_authorization_token" "token" {}
 
 locals {
   source_path   = "../"
-  path_include  = ["src/**", "Dockerfile", "package.json"]
-  path_exclude  = ["**/__tests__/**", "dist/**", "node_modules/**", "**/.git/**", "**/.vscode/**", "tf/**", "jest.config.js", "data.json", "data/**"]
+  path_include  = ["src/*.ts", "Dockerfile", "package.json" ]
+  path_exclude  = ["**/_tests_/**", "dist/**", "node_modules/**", "**/.git/**", "**/.vscode/**", "tf/**", "*.csv", "jest.config.js", "data.json", "data/**", "package-lock.json", "tsconfig.json"]
   files_include = setunion([for f in local.path_include : fileset(local.source_path, f)]...)
   files_exclude = setunion([for f in local.path_exclude : fileset(local.source_path, f)]...)
   files         = sort(setsubtract(local.files_include, local.files_exclude))
@@ -58,7 +58,7 @@ module "lambda_function_with_docker_build_from_ecr" {
   function_name = "pge-lambda-with-docker-build-from-ecr"
   description   = "PGE Test"
 
-  timeout = 5
+  timeout = 30
 
   environment_variables = {
     FILE_OUTPUT = aws_s3_bucket.pge_data_bucket.bucket
