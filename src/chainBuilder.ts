@@ -7,7 +7,7 @@ import { streamArray } from 'stream-json/streamers/StreamArray';
 import { disassembler } from 'stream-json/Disassembler';
 import { ArrayTransform } from "./arrayTransform";
 import { json2csv } from 'json-2-csv';
-import { IRenamedStation, IStation } from "../processData";
+import { IRenamedStation, IStation } from "./processData";
 
 export class ChainBuilder {
   inputStream: IncomingMessage;
@@ -24,7 +24,7 @@ export class ChainBuilder {
     });
   }
 
-  public getChain(stations: {count: number}): any {
+  public getChain(stations: {capacity: number, count: number}): any {
     return Chain.chain([
       this.inputStream,
       parser(),
@@ -33,7 +33,7 @@ export class ChainBuilder {
       data => {
         const value: IStation = data.value;
         const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = value;
-        if (data.value.capacity < 12) {
+        if (data.value.capacity < stations.capacity) {
           stations.count ++;
           // station_type,name,eightd_has_key_dispenser,has_kiosk,lat,electric_bike_surcharge_waiver,short_name,lon,capacity,externalId,stationId,legacyId,address
           return json2csv([{
