@@ -7,10 +7,10 @@ import { IncomingMessage } from 'http';
 
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import { PayloadBuffer } from '../src/streams/payloadBuffer';
-import { MemoryReader } from '../src/streams/memoryReader';
-import { MemoryWriter } from '../src/streams/memoryWriter';
-import { ChainBuilder } from '../src/streams/chainBuilder';
+import { PayloadBuffer } from '../src/payloadBuffer';
+import { MemoryReader } from '../src/memoryReader';
+import { MemoryWriter } from '../src/memoryWriter';
+import { ChainBuilder } from '../src/chainBuilder';
 
 
 jest.mock('@hapi/wreck');
@@ -93,16 +93,21 @@ describe('HttpClient', () => {
     });
 
     const prom = new Promise<void>((resolve, reject) => {
-      const stationsInCapacity = { count: 0 };
-      const fileWriter = fs.createWriteStream('output.csv');
-      const chainBuilder = new ChainBuilder(json, fileWriter);
+      try {
+        const stationsInCapacity = { capacity: 12, count: 0 };
+        const fileWriter = fs.createWriteStream('output.csv');
+        const chainBuilder = new ChainBuilder(json, fileWriter);
 
-      const ch = chainBuilder.getChain(stationsInCapacity);
+        const ch = chainBuilder.getChain(stationsInCapacity);
 
-      ch.on('end', () => {
-        resolve();
-      });
-    });
+        ch.on('end', () => {
+          resolve();
+        });
+      } catch (error) {
+        reject(error);
+      }
+    }
+    );
 
     await prom;
 
@@ -115,33 +120,34 @@ describe('HttpClient', () => {
       }).on('error', (error) => { reject(error); });
     });
 
-    const s3 = new S3Client();
+    const prom = new Promise<any>((resolve, reject) => {
+      try {
+        const s3 = new S3Client();
+        const stationsInCapacity = { capacity: 12, count: 0 };
+        const payloadBuffer = new PayloadBuffer();
+        const memoryReader = new MemoryReader(payloadBuffer);
+        const memoryWriter = new MemoryWriter(payloadBuffer);
+        const chainBuilder = new ChainBuilder(json, memoryWriter);
 
-    const prom = new Promise<Upload>((resolve, reject) => {
+        const ch = chainBuilder.getChain(stationsInCapacity);
 
-      const stationsInCapacity = { count: 0 };
-      const payloadBuffer = new PayloadBuffer();
-      const memoryReader = new MemoryReader(payloadBuffer);
-      const memoryWriter = new MemoryWriter(payloadBuffer);
-      const chainBuilder = new ChainBuilder(json, memoryWriter);
-
-      const ch = chainBuilder.getChain(stationsInCapacity);
-
-      memoryWriter.on('end', async () => {
-        resolve(new Upload({
-          client: s3,
-          params: {
-            Bucket: 'pge-data-bucket',
-            Key: 'data.csv',
-            Body: memoryReader,
-          },
-        }));
-      });
+        memoryWriter.on('end', async () => {
+          const up = new Upload({
+            client: s3,
+            params: {
+              Bucket: 'pge-data-bucket',
+              Key: 'data.csv',
+              Body: memoryReader,
+            },
+          });
+          resolve(await up.done());
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
 
-    const pipe = await prom;
-    await pipe.done();
-
+    await prom;
   });
 });
 

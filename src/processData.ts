@@ -3,10 +3,10 @@ import * as https from 'https';
 import { IncomingMessage } from 'http';
 import { Upload } from "@aws-sdk/lib-storage";
 import { S3Client } from "@aws-sdk/client-s3";
-import { MemoryReader } from './streams/memoryReader';
-import { MemoryWriter } from './streams/memoryWriter';
-import { PayloadBuffer } from './streams/payloadBuffer';
-import { ChainBuilder } from './streams/chainBuilder';
+import { MemoryReader } from './memoryReader';
+import { MemoryWriter } from './memoryWriter';
+import { PayloadBuffer } from './payloadBuffer';
+import { ChainBuilder } from './chainBuilder';
 
 export interface IBaseStation {
   station_type?: string;
@@ -99,15 +99,19 @@ export class ProcessData {
     });
 
     return new Promise<void>((resolve, reject) => {
-      const stationsInCapacity = { count: 0 };
-      const fileWriter = fs.createWriteStream('/tmp/data.csv');
-      const chainBuilder = new ChainBuilder(json, fileWriter);
+      try {
+        const stationsInCapacity = { capacity: MAX_CAPACITY, count: 0 };
+        const fileWriter = fs.createWriteStream('/tmp/data.csv');
+        const chainBuilder = new ChainBuilder(json, fileWriter);
 
-      const ch = chainBuilder.getChain(stationsInCapacity);
+        const ch = chainBuilder.getChain(stationsInCapacity);
 
-      ch.on('end', () => {
-        resolve();
-      });
+        ch.on('end', () => {
+          resolve();
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
@@ -121,30 +125,31 @@ export class ProcessData {
       }).on('error', (error) => { reject(error); });
     });
 
-    const s3 = new S3Client();
+    return new Promise<any>((resolve, reject) => {
+      try {
+        const s3 = new S3Client();
+        const stationsInCapacity = { capacity: MAX_CAPACITY, count: 0 };
+        const payloadBuffer = new PayloadBuffer();
+        const memoryReader = new MemoryReader(payloadBuffer);
+        const memoryWriter = new MemoryWriter(payloadBuffer);
+        const chainBuilder = new ChainBuilder(json, memoryWriter);
 
-    const prom = new Promise<Upload>((resolve, reject) => {
-      const stationsInCapacity = { count: 0 };
-      const payloadBuffer = new PayloadBuffer();
-      const memoryReader = new MemoryReader(payloadBuffer);
-      const memoryWriter = new MemoryWriter(payloadBuffer);
-      const chainBuilder = new ChainBuilder(json, memoryWriter);
+        const ch = chainBuilder.getChain(stationsInCapacity);
 
-      const ch = chainBuilder.getChain(stationsInCapacity);
-
-      memoryWriter.on('end', async () => {
-        resolve(new Upload({
-          client: s3,
-          params: {
-            Bucket: FILE_OUTPUT,
-            Key: 'data.csv',
-            Body: memoryReader,
-          },
-        }));
-      });
+        memoryWriter.on('end', async () => {
+          const up = new Upload({
+            client: s3,
+            params: {
+              Bucket: FILE_OUTPUT,
+              Key: 'data.csv',
+              Body: memoryReader,
+            },
+          });
+          resolve(await up.done());
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
-
-    const pipe = await prom;
-    await pipe.done();
   }
 } 
