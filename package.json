@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "buildLambda": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "buildLambda": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2022 --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --target=es2022 --outfile=dist/index.js",
     "test": "jest",
     "test-ci": "jest --ci --reporters=jest-junit"
   },
