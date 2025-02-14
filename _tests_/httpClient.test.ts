@@ -122,11 +122,11 @@ describe('HttpClient', () => {
       },
     });
 
-    const stationsInCapacity = { capacity: 12, count: 0 };
-    const chainBuilder = new ChainBuilder({} as any, passThrough);
-    const rawPipeline = chainBuilder.getPipelineRaw(stationsInCapacity);
-
     const prom = new Promise<void>((resolve, reject) => {
+      const stationsInCapacity = { capacity: 12, count: 0 };
+      const chainBuilder = new ChainBuilder({} as any, passThrough);
+      const rawPipeline = chainBuilder.getPipelineRaw(stationsInCapacity);
+
       https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
         rawPipeline[0] = res;
 

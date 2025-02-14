@@ -17,8 +17,8 @@ export class ChainBuilder {
     this.outputStream = outputStream;
     this.basePipe = [
       this.inputStream,
-      new Parser(),
-      new Pick({ filter: 'data.stations' }),
+      new Parser({ streamValues: false }),
+      new Pick({ streamValues: false, filter: 'data.stations' }),
       new StreamArray(),
     ];
   }
@@ -28,7 +28,7 @@ export class ChainBuilder {
       readableObjectMode: false,
       writableObjectMode: true,
       encoding: 'utf8',
-      station: stations
+      station: stations,      
     });
   }
 
