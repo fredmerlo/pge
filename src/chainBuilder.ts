@@ -38,7 +38,7 @@ export class ChainBuilder {
     this.basePipe.push(csv);
     this.basePipe.push(this.outputStream);
 
-    return Chain.chain(this.basePipe);
+    return {chain: Chain.chain(this.basePipe), csv: csv};
   }
 
   public async getPipeline(stations: {capacity: number, count: number}): Promise<any> {

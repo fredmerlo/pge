@@ -92,16 +92,16 @@ describe('HttpClient', () => {
       }).on('error', (error) => { reject(error); });
     });
 
-    const prom = new Promise<void>((resolve, reject) => {
+    const prom = new Promise<any>((resolve, reject) => {
       try {
         const stationsInCapacity = { capacity: 12, count: 0 };
         const fileWriter = fs.createWriteStream('output.csv');
         const chainBuilder = new ChainBuilder(json, fileWriter);
 
-        const ch = chainBuilder.getChain(stationsInCapacity);
+        const { chain, csv } = chainBuilder.getChain(stationsInCapacity);
 
-        ch.on('end', () => {
-          resolve();
+        csv.on('end', () => {
+          resolve(fileWriter.end());
         });
       } catch (error) {
         reject(error);

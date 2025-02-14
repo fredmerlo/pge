@@ -97,16 +97,16 @@ export class ProcessData {
       }).on('error', (error) => { reject(error); });
     });
 
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
       try {
         const stationsInCapacity = { capacity: MAX_CAPACITY, count: 0 };
         const fileWriter = fs.createWriteStream('/tmp/data.csv');
         const chainBuilder = new ChainBuilder(json, fileWriter);
 
-        const ch = chainBuilder.getChain(stationsInCapacity);
+        const { chain, csv } = chainBuilder.getChain(stationsInCapacity);
 
-        ch.on('end', () => {
-          resolve();
+        csv.on('end', () => {
+          resolve(fileWriter.end());
         });
       } catch (error) {
         reject(error);

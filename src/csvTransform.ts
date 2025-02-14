@@ -45,10 +45,4 @@ export class CsvTransform extends Transform {
 
     callback();
   }
-
-  _final(callback: (error?: Error | null) => void): void {
-    this.push(null);
-    this.emit('end');
-    callback();
-  }
 }
