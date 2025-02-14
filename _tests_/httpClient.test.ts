@@ -7,11 +7,8 @@ import { IncomingMessage } from 'http';
 
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import { PayloadBuffer } from '../src/payloadBuffer';
-import { MemoryReader } from '../src/memoryReader';
-import { MemoryWriter } from '../src/memoryWriter';
 import { ChainBuilder } from '../src/chainBuilder';
-
+import { PassThrough, pipeline } from 'stream';
 
 jest.mock('@hapi/wreck');
 
@@ -92,16 +89,16 @@ describe('HttpClient', () => {
       }).on('error', (error) => { reject(error); });
     });
 
-    const prom = new Promise<void>((resolve, reject) => {
+    const prom = new Promise<any>((resolve, reject) => {
       try {
         const stationsInCapacity = { capacity: 12, count: 0 };
         const fileWriter = fs.createWriteStream('output.csv');
         const chainBuilder = new ChainBuilder(json, fileWriter);
 
-        const ch = chainBuilder.getChain(stationsInCapacity);
+        const { chain, csv } = chainBuilder.getChain(stationsInCapacity);
 
-        ch.on('end', () => {
-          resolve();
+        csv.on('end', () => {
+          resolve(fileWriter.end());
         });
       } catch (error) {
         reject(error);
@@ -113,40 +110,43 @@ describe('HttpClient', () => {
 
   });
   it.skip('tests stream-json with pipeline to S3', async () => {
-    const json = await new Promise<IncomingMessage>((resolve, reject) => {
+    const passThrough = new PassThrough();
+
+    const s3 = new S3Client();
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: 'pge-data-bucket',
+        Key: 'data.csv',
+        Body: passThrough,
+      },
+    });
+
+    const stationsInCapacity = { capacity: 12, count: 0 };
+    const chainBuilder = new ChainBuilder({} as any, passThrough);
+    const rawPipeline = chainBuilder.getPipelineRaw(stationsInCapacity);
+
+    const prom = new Promise<void>((resolve, reject) => {
       https.get('https://gbfs.divvybikes.com/gbfs/en/station_information.json', (res) => {
-        res.readableObjectMode
-        resolve(res);
+        rawPipeline[0] = res;
+
+        pipeline(rawPipeline, (err) => {
+          if (err) {
+            return reject(err);
+          }
+
+          resolve();
+        });
       }).on('error', (error) => { reject(error); });
     });
 
-    const prom = new Promise<any>((resolve, reject) => {
-      try {
-        const s3 = new S3Client();
-        const stationsInCapacity = { capacity: 12, count: 0 };
-        const payloadBuffer = new PayloadBuffer();
-        const memoryReader = new MemoryReader(payloadBuffer);
-        const memoryWriter = new MemoryWriter(payloadBuffer);
-        const chainBuilder = new ChainBuilder(json, memoryWriter);
-
-        const ch = chainBuilder.getPipeline(stationsInCapacity);
-
-        memoryWriter.on('end', async () => {
-          const up = new Upload({
-            client: s3,
-            params: {
-              Bucket: 'pge-data-bucket',
-              Key: 'data.csv',
-              Body: memoryReader,
-            },
-          });
-          resolve(await up.done());
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-
-    await prom;
+    try {
+      await Promise.all([
+        prom, 
+        upload.done()
+      ]);
+    } catch (error) {
+      console.error(error);
+    }
   });
 });

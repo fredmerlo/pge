@@ -32,7 +32,7 @@
     "@hapi/jwt": "^3.2.0",
     "@hapi/log": "^2.0.1",
     "@hapi/wreck": "^18.1.0",
-    "json-2-csv": "^5.5.8",
+    "@iwsio/json-csv-core": "^1.2.0",
     "npm": "^11.1.0",
     "stream-json": "^1.9.1"
   }

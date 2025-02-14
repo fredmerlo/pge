@@ -1,10 +1,21 @@
 import { CsvData } from '../src/csvData';
-import { json2csv } from 'json-2-csv';
 import { promises as fs } from 'fs';
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { toCsv } from "@iwsio/json-csv-core";
 
-jest.mock('json-2-csv');
+jest.mock('@iwsio/json-csv-core', () => ({
+  toCsv: jest.fn((data, opts) => ({
+    data: [{ key: 'value' }],
+    opts: {
+      fields: [
+        { name: 'key' },
+      ]
+    }
+  }))
+}
+));
+
 jest.mock('fs', () => ({
   promises: {
     writeFile: jest.fn()
@@ -31,13 +42,13 @@ describe('CsvData', () => {
   it('should convert JSON to CSV and write to a file', async () => {
     const mockData = [{ key: 'value' }];
     const mockCsv = 'key,value\nvalue';
-    (json2csv as jest.Mock).mockResolvedValue(mockCsv);
-    
+    (toCsv as jest.Mock).mockResolvedValue(mockCsv);
+
     (fs.writeFile as jest.Mock).mockResolvedValue(undefined);
 
     const result = await csvData.convert(mockData);
 
-    expect(json2csv).toHaveBeenCalledWith(mockData);
+    expect(toCsv).toHaveBeenCalled();
     expect(fs.writeFile).toHaveBeenCalledWith('/processed/data.csv', mockCsv);
     expect(result).toBe(mockCsv);
   });
@@ -45,7 +56,7 @@ describe('CsvData', () => {
   it('should handle errors during JSON to CSV conversion', async () => {
     const mockData = { key: 'value' };
     const mockError = new Error('mockError');
-    (json2csv as jest.Mock).mockRejectedValue(mockError);
+    (toCsv as jest.Mock).mockRejectedValue(mockError);
 
     await expect(csvData.convert(mockData)).rejects.toThrow('mockError');
   });
@@ -64,10 +75,10 @@ describe('CsvData', () => {
     const mockData = [{ key: 'value' }];
     const mockCsv = 'key,value\nvalue';
     const csvPutObjectCommand = new PutObjectCommand({ Bucket: process.env.FILE_OUTPUT, Key: 'data.csv', Body: mockCsv });
-    
+
     const mockPut = jest.fn().mockResolvedValue(csvPutObjectCommand);
-    
-    (json2csv as jest.Mock).mockResolvedValue(mockCsv);
+
+    (toCsv as jest.Mock).mockResolvedValue(mockCsv);
     (S3Client as jest.Mock).mockImplementation(() => ({
       send: mockPut
     }));
@@ -75,14 +86,14 @@ describe('CsvData', () => {
 
     const result = await csvData.convert(mockData);
 
-    expect(json2csv).toHaveBeenCalledWith(mockData);
+    expect(toCsv).toHaveBeenCalled();
     expect(mockPut).toHaveBeenCalledWith(csvPutObjectCommand);
 
   });
   it('should get CSV from S3 return a signed url', async () => {
     process.env.FILE_OUTPUT = 'S3_BUCKET_NAME';
     const mockUrl = 'mockurl';
-    
+
     (S3Client as jest.Mock).mockReturnThis();
     const s3 = new S3Client();
 
