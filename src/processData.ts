@@ -136,11 +136,11 @@ export class ProcessData {
       },
     });
 
-    const stationsInCapacity = { capacity: 12, count: 0 };
-    const chainBuilder = new ChainBuilder({} as any, passThrough);
-    const rawPipeline = chainBuilder.getPipelineRaw(stationsInCapacity);
-
     const processingPipeline = new Promise<void>((resolve, reject) => {
+      const stationsInCapacity = { capacity: 12, count: 0 };
+      const chainBuilder = new ChainBuilder({} as any, passThrough);
+      const rawPipeline = chainBuilder.getPipelineRaw(stationsInCapacity);
+
       https.get(url, (res) => {
         rawPipeline[0] = res;
 

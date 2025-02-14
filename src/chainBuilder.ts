@@ -17,18 +17,21 @@ export class ChainBuilder {
     this.outputStream = outputStream;
     this.basePipe = [
       this.inputStream,
-      new Parser(),
-      new Pick({ filter: 'data.stations' }),
+      new Parser({ streamValues: false }),
+      new Pick({ streamValues: false, filter: 'data.stations' }),
       new StreamArray(),
     ];
   }
 
   createCSVTransform(stations: {capacity: number, count: number}): CsvTransform {
+    const UPLOAD_BATCH_SIZE = Number.parseInt(process.env.UPLOAD_BATCH_SIZE || "5000");
+
     return new CsvTransform({
       readableObjectMode: false,
       writableObjectMode: true,
       encoding: 'utf8',
-      station: stations
+      station: stations,
+      batchSize: UPLOAD_BATCH_SIZE,
     });
   }
 
