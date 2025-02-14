@@ -1,8 +1,8 @@
 
-import { json2csv } from "json-2-csv";
 import { promises as fs } from "fs";
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { toCsv } from "@iwsio/json-csv-core";
 
 export class CsvData {
 
@@ -10,7 +10,23 @@ export class CsvData {
     const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
     const csv = await new Promise<string>((resolve, reject) => {
       try {
-        resolve(json2csv(data));
+        resolve(toCsv(data as { [key: string]: any }[], {
+          fields: [
+            { name: 'station_type' },
+            { name: 'name' },
+            { name: 'eightd_has_key_dispenser' },
+            { name: 'has_kiosk' },
+            { name: 'lat' },
+            { name: 'electric_bike_surcharge_waiver' },
+            { name: 'short_name' },
+            { name: 'lon' },
+            { name: 'capacity' },
+            { name: 'externalId' },
+            { name: 'stationId' },
+            { name: 'legacyId' },
+            { name: 'address' },
+          ],
+        }));
       } catch (error) {
         reject(error);
       }

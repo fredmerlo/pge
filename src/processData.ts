@@ -73,10 +73,19 @@ export class ProcessData {
             if (station.capacity < MAX_CAPACITY) {
               const { rental_methods, rental_uris, eightd_station_services, external_id, station_id, legacy_id, ...rest } = station;
               const renamedStation: IRenamedStation = {
-                ...rest,
-                externalId: external_id,
-                stationId: station_id,
-                legacyId: legacy_id
+                station_type: rest.station_type ?? 'undefined' as any,
+                name: rest.name ?? 'undefined' as any,
+                eightd_has_key_dispenser: rest.eightd_has_key_dispenser ?? 'undefined' as any,
+                has_kiosk: rest.has_kiosk ?? 'undefined' as any,
+                lat: rest.lat ?? 'undefined' as any,
+                electric_bike_surcharge_waiver: rest.electric_bike_surcharge_waiver ?? 'undefined' as any,
+                short_name: rest.short_name ?? 'undefined' as any,
+                lon: rest.lon ?? 'undefined' as any,
+                capacity: rest.capacity ?? 'undefined' as any,
+                externalId: external_id ?? 'undefined' as any,
+                stationId: station_id ?? 'undefined' as any,
+                legacyId: legacy_id ?? 'undefined' as any,
+                address: rest.address ?? 'undefined' as any,
               };
               return renamedStation;
             }
