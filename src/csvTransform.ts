@@ -1,6 +1,6 @@
 import { Transform, TransformOptions } from 'node:stream';
 import { TransformCallback } from 'stream';
-import { IRenamedStation, IStation } from "./processData";
+import { IStation } from "./processData";
 import { toCsv } from '@iwsio/json-csv-core';
 
 export interface Station {
@@ -48,7 +48,6 @@ export class CsvTransform extends Transform {
       this.batch.push(data);
 
       if (this.batch.length >= this.batchSize) {
-        console.log(this.batch.length);
         const csvData = toCsv(this.batch, {
           fields: [
             { name: 'station_type' },
@@ -78,7 +77,6 @@ export class CsvTransform extends Transform {
   }
 
   _flush(callback: TransformCallback): void {
-    console.log(this.batch.length);
     if (this.batch.length) {
       const csvData = toCsv(this.batch, {
         fields: [
