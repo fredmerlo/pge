@@ -81,7 +81,11 @@ describe('ProcessData', () => {
         capacity: 10,
         short_name: 'S1',
         station_type: 'type1',
-        legacyId: 'leg1'
+        legacyId: 'leg1',
+        address: 'undefined',
+        eightd_has_key_dispenser: 'undefined',
+        electric_bike_surcharge_waiver: 'undefined',
+        has_kiosk: 'undefined',
       },
       {
         stationId: '3',
@@ -92,7 +96,11 @@ describe('ProcessData', () => {
         capacity: 10,
         short_name: 'S3',
         station_type: 'type1',
-        address: '123 Main St.'
+        address: '123 Main St.',
+        eightd_has_key_dispenser: 'undefined',
+        electric_bike_surcharge_waiver: 'undefined',
+        has_kiosk: 'undefined',
+        legacyId: 'undefined',
       }
     ]);
   });
