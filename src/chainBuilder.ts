@@ -49,4 +49,13 @@ export class ChainBuilder {
 
     return await pipeline(this.basePipe);
   }
+
+  public getPipelineRaw(stations: {capacity: number, count: number}): any[] {
+    const csv = this.createCSVTransform(stations);
+
+    this.basePipe.push(csv);
+    this.basePipe.push(this.outputStream);
+
+    return this.basePipe;
+  }
 }

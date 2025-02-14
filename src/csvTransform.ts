@@ -58,9 +58,9 @@ export class CsvTransform extends Transform {
         ],
         ignoreHeader: opts.station.count > 1
       });
-      this.push(csvData);
+      callback(null, csvData);
+    } else {
+      callback();
     }
-
-    callback();
   }
 }

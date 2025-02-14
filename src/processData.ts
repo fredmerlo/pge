@@ -3,10 +3,8 @@ import * as https from 'https';
 import { IncomingMessage } from 'http';
 import { Upload } from "@aws-sdk/lib-storage";
 import { S3Client } from "@aws-sdk/client-s3";
-import { MemoryReader } from './memoryReader';
-import { MemoryWriter } from './memoryWriter';
-import { PayloadBuffer } from './payloadBuffer';
 import { ChainBuilder } from './chainBuilder';
+import { PassThrough, pipeline } from 'stream';
 
 export interface IBaseStation {
   station_type?: string;
@@ -123,40 +121,42 @@ export class ProcessData {
     });
   }
 
-  async processAWS(url: string): Promise<void> {
+  async processAWS(url: string): Promise<any> {
     const FILE_OUTPUT = process.env.FILE_OUTPUT || "LOCAL";
 
-    const json = await new Promise<IncomingMessage>((resolve, reject) => {
+    const s3 = new S3Client();
+    const passThrough = new PassThrough();
+
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: FILE_OUTPUT,
+        Key: 'data.csv',
+        Body: passThrough,
+      },
+    });
+
+    const stationsInCapacity = { capacity: 12, count: 0 };
+    const chainBuilder = new ChainBuilder({} as any, passThrough);
+    const rawPipeline = chainBuilder.getPipelineRaw(stationsInCapacity);
+
+    const processingPipeline = new Promise<void>((resolve, reject) => {
       https.get(url, (res) => {
-        resolve(res);
+        rawPipeline[0] = res;
+
+        pipeline(rawPipeline, (err) => {
+          if (err) {
+            return reject(err);
+          }
+
+          resolve();
+        });
       }).on('error', (error) => { reject(error); });
     });
 
-    return new Promise<any>((resolve, reject) => {
-      try {
-        const s3 = new S3Client();
-        const stationsInCapacity = { capacity: MAX_CAPACITY, count: 0 };
-        const payloadBuffer = new PayloadBuffer();
-        const memoryReader = new MemoryReader(payloadBuffer);
-        const memoryWriter = new MemoryWriter(payloadBuffer);
-        const chainBuilder = new ChainBuilder(json, memoryWriter);
-
-        const ch = chainBuilder.getPipeline(stationsInCapacity);
-
-        memoryWriter.on('end', async () => {
-          const up = new Upload({
-            client: s3,
-            params: {
-              Bucket: FILE_OUTPUT,
-              Key: 'data.csv',
-              Body: memoryReader,
-            },
-          });
-          resolve(await up.done());
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
+    return Promise.all([
+      processingPipeline,
+      upload.done()
+    ]);
   }
 } 
