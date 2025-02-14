@@ -24,11 +24,14 @@ export class ChainBuilder {
   }
 
   createCSVTransform(stations: {capacity: number, count: number}): CsvTransform {
+    const UPLOAD_BATCH_SIZE = Number.parseInt(process.env.UPLOAD_BATCH_SIZE || "250");
+
     return new CsvTransform({
       readableObjectMode: false,
       writableObjectMode: true,
       encoding: 'utf8',
-      station: stations,      
+      station: stations,
+      batchSize: UPLOAD_BATCH_SIZE,
     });
   }
 
