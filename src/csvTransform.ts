@@ -18,7 +18,7 @@ export class CsvTransform extends Transform {
   constructor(opts?: TransformOptions & StationOptions & { batchSize?: number } | undefined) {
     super(opts);
     this.opts = opts as StationOptions;
-    this.batchSize = opts?.batchSize ?? 250;
+    this.batchSize = opts?.batchSize ?? 5000;
   }
 
   _transform(chunk: any, encoding: BufferEncoding, callback: TransformCallback): void {

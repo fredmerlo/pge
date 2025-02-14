@@ -63,7 +63,7 @@ module "lambda_function_with_docker_build_from_ecr" {
   environment_variables = {
     FILE_OUTPUT = aws_s3_bucket.pge_data_bucket.bucket
     MAX_AGE = "180"
-    UPLOAD_BATCH_SIZE = "250"
+    UPLOAD_BATCH_SIZE = "5000"
   }
 
   create_package = false
